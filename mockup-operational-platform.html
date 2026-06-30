@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IRC People &amp; Process</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#fff;font-size:13.5px;color:#1c1e21;display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+
+    /* ── TOP NAV ── */
+    .topnav{background:#fff;border-bottom:2px solid #1A3ECA;padding:0 24px;display:flex;align-items:center;gap:0;flex-shrink:0;}
+    .topnav-brand{font-weight:800;font-size:13.5px;color:#1A3ECA;letter-spacing:.02em;padding:12px 20px 12px 0;border-right:1px solid #e8eaed;margin-right:4px;white-space:nowrap;}
+    .topnav-item{padding:12px 13px;font-size:12.5px;color:#65676b;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;}
+    .topnav-item:hover{color:#1A3ECA;}
+    .topnav-item.active{color:#1A3ECA;font-weight:700;border-bottom-color:#1A3ECA;}
+    .topnav-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:#1A3ECA;margin-left:5px;vertical-align:middle;opacity:.6;animation:dp 2.5s ease infinite;}
+    @keyframes dp{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:.15;transform:scale(.65)}}
+
+    /* ── MAIN ── */
+    .main{flex:1;overflow:hidden;position:relative;}
+    .view{position:absolute;inset:0;overflow-y:auto;}
+    .view.hidden{display:none;}
+
+    /* ── HOME VIEW ── */
+    .home-hero{background:linear-gradient(135deg,#1A3ECA 0%,#3b5fe4 100%);color:#fff;padding:32px 40px 28px;}
+    .home-eyebrow{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;opacity:.75;margin-bottom:8px;}
+    .home-title{font-size:26px;font-weight:800;letter-spacing:-.03em;line-height:1.2;margin-bottom:10px;}
+    .home-desc{font-size:13px;opacity:.85;max-width:540px;line-height:1.6;}
+
+    .role-section{padding:28px 40px;}
+    .role-section-title{font-size:18px;font-weight:700;letter-spacing:-.02em;margin-bottom:6px;}
+    .role-section-sub{font-size:13px;color:#65676b;margin-bottom:20px;}
+    .role-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+    .role-card{background:#fff;border:1px solid #e8eaed;border-radius:10px;padding:18px 16px;cursor:pointer;transition:box-shadow .15s,border-color .15s;}
+    .role-card:hover{box-shadow:0 4px 16px rgba(26,62,202,.12);border-color:#a5b4fc;}
+    .role-card.active{border-color:#1A3ECA;background:#f0f4ff;box-shadow:0 0 0 2px rgba(26,62,202,.12);}
+    .role-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:12px;}
+    .role-title{font-size:13.5px;font-weight:700;margin-bottom:5px;}
+    .role-desc{font-size:12px;color:#65676b;line-height:1.5;}
+
+    .snapshot-section{padding:0 40px 28px;}
+    .snapshot-title{font-size:13px;font-weight:700;color:#65676b;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;}
+    .snapshot-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+    .snap-card{background:#f8f9fb;border:1px solid #e8eaed;border-radius:8px;padding:12px 14px;}
+    .snap-num{font-size:22px;font-weight:800;color:#1A3ECA;letter-spacing:-.03em;}
+    .snap-label{font-size:11.5px;color:#65676b;margin-top:2px;line-height:1.3;}
+
+    /* ── ROLE CONTENT VIEWS (shared) ── */
+    .role-content-header{background:#f8f9fb;border-bottom:1px solid #e8eaed;padding:20px 40px 16px;}
+    .role-breadcrumb{font-size:12px;color:#65676b;margin-bottom:6px;cursor:pointer;}
+    .role-breadcrumb span{color:#1A3ECA;}
+    .role-content-title{font-size:20px;font-weight:800;letter-spacing:-.03em;}
+    .role-content-sub{font-size:13px;color:#65676b;margin-top:4px;}
+    .role-content-body{padding:24px 40px;}
+
+    .quick-links{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;}
+    .quick-link{background:#fff;border:1px solid #e8eaed;border-radius:8px;padding:14px 16px;cursor:pointer;}
+    .quick-link:hover{border-color:#a5b4fc;background:#f0f4ff;}
+    .ql-icon{font-size:16px;margin-bottom:6px;}
+    .ql-title{font-size:13px;font-weight:700;margin-bottom:3px;}
+    .ql-desc{font-size:12px;color:#65676b;}
+
+    .checklist-section{background:#fff;border:1px solid #e8eaed;border-radius:8px;padding:16px 18px;margin-bottom:16px;}
+    .checklist-title{font-size:13px;font-weight:700;margin-bottom:12px;}
+    .check-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #f0f2f5;}
+    .check-item:last-child{border-bottom:none;}
+    .check-box{width:16px;height:16px;border-radius:4px;border:2px solid #ccd0d5;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:10px;}
+    .check-box.done{background:#22c55e;border-color:#22c55e;color:#fff;}
+    .check-text{font-size:12.5px;line-height:1.4;}
+    .check-due{font-size:11px;color:#8a8d91;margin-top:2px;}
+
+    .callout-box{background:#eef2ff;border:1px solid #c7d2fe;border-radius:8px;padding:14px 16px;margin-bottom:16px;}
+    .callout-label{font-size:11px;font-weight:700;color:#1A3ECA;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;}
+    .callout-text{font-size:12.5px;color:#3730a3;line-height:1.6;}
+
+    /* ── TOUR CURSOR ── */
+    #tc{position:fixed;width:22px;height:22px;border-radius:50%;background:rgba(26,62,202,.18);border:2px solid #1A3ECA;transform:translate(-50%,-50%);pointer-events:none;z-index:9999;opacity:0;transition:left .55s cubic-bezier(.4,0,.2,1),top .55s cubic-bezier(.4,0,.2,1),opacity .3s;}
+    #tc.ck{background:rgba(26,62,202,.38);transform:translate(-50%,-50%) scale(.65);transition:transform .15s,background .15s;}
+    .tcr{position:absolute;inset:-7px;border-radius:50%;border:1.5px solid rgba(26,62,202,.3);animation:tr 1.4s ease infinite;}
+    @keyframes tr{0%{transform:scale(.7);opacity:.9}100%{transform:scale(1.9);opacity:0}}
+
+    /* ── ROADMAPPING VIEW ── */
+    .rm-header{background:linear-gradient(135deg,#1A3ECA 0%,#3b5fe4 100%);color:#fff;padding:22px 40px 18px;flex-shrink:0;}
+    .rm-badge-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+    .rm-half-badge{background:rgba(255,255,255,.22);color:#fff;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.06em;}
+    .rm-complete-badge{background:#22c55e;color:#fff;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px;}
+    .rm-title{font-size:21px;font-weight:800;letter-spacing:-.03em;margin-bottom:5px;}
+    .rm-sub{font-size:12px;opacity:.82;line-height:1.5;}
+    .rm-body{padding:20px 40px 60px;}
+    .rm-intro-text{font-size:12.5px;line-height:1.7;color:#3c4043;margin-bottom:16px;}
+    .rm-stats-bar{display:flex;margin-bottom:20px;background:#f8f9fb;border:1px solid #e8eaed;border-radius:8px;overflow:hidden;}
+    .rm-stat{flex:1;padding:11px 14px;border-right:1px solid #e8eaed;text-align:center;}
+    .rm-stat:last-child{border-right:none;}
+    .rm-stat-num{display:block;font-size:17px;font-weight:800;color:#1A3ECA;letter-spacing:-.02em;}
+    .rm-stat-label{display:block;font-size:10.5px;color:#65676b;margin-top:2px;}
+    .rm-filter-bar{display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap;}
+    .rm-filter{padding:5px 13px;border-radius:20px;font-size:11.5px;font-weight:600;border:1px solid #e8eaed;cursor:pointer;color:#65676b;background:#fff;transition:all .15s;}
+    .rm-filter:hover{border-color:#a5b4fc;color:#1A3ECA;}
+    .rm-filter.active{background:#1A3ECA;color:#fff;border-color:#1A3ECA;}
+    .rm-obl{background:#fff;border:1px solid #e8eaed;border-radius:8px;padding:12px 14px;margin-bottom:9px;transition:box-shadow .15s;}
+    .rm-obl:hover{box-shadow:0 2px 10px rgba(26,62,202,.1);}
+    .rm-obl.hidden{display:none;}
+    .rm-obl-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:6px;}
+    .rm-obl-name{font-size:12.5px;font-weight:700;color:#1c1e21;line-height:1.4;}
+    .rm-obl-desc{font-size:11.5px;color:#65676b;line-height:1.5;margin-bottom:9px;}
+    .rm-obl-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+    .rm-region-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;letter-spacing:.04em;white-space:nowrap;}
+    .rm-region-badge.APAC{background:#dce8ff;color:#1A3ECA;}
+    .rm-region-badge.EMEA{background:#ede9fe;color:#6d28d9;}
+    .rm-region-badge.LATAM{background:#dcfce7;color:#15803d;}
+    .rm-region-badge.NORAM{background:#fef3c7;color:#b45309;}
+    .rm-track-badges{display:flex;gap:4px;flex-wrap:wrap;}
+    .rm-track-badge{font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;}
+    .rm-track-badge.RR{background:#dce8ff;color:#1A3ECA;}
+    .rm-track-badge.CS{background:#ede9fe;color:#6d28d9;}
+    .rm-track-badge.HC{background:#fee2e2;color:#b91c1c;}
+    .rm-track-badge.AI{background:#d1fae5;color:#065f46;}
+    .rm-track-badge.FS{background:#fef3c7;color:#b45309;}
+    .rm-track-badge.DC{background:#e0f2fe;color:#0369a1;}
+    .rm-track-badge.RC{background:#f1f5f9;color:#475569;}
+    .rm-products{font-size:11px;color:#65676b;}
+    .rm-products strong{color:#1c1e21;font-weight:600;}
+    .rm-deadline{font-size:11px;font-weight:700;white-space:nowrap;padding:3px 8px;border-radius:4px;}
+    .rm-deadline.red{background:#fee2e2;color:#b91c1c;}
+    .rm-deadline.amber{background:#fef3c7;color:#b45309;}
+    .rm-deadline.green{background:#dcfce7;color:#15803d;}
+    .rm-section-title{font-size:11px;font-weight:700;color:#65676b;text-transform:uppercase;letter-spacing:.08em;margin:20px 0 9px;}
+    .rm-track-table{width:100%;border-collapse:collapse;font-size:11.5px;}
+    .rm-track-table th{background:#f8f9fb;padding:7px 11px;text-align:left;font-weight:700;border-bottom:2px solid #e8eaed;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#65676b;}
+    .rm-track-table td{padding:8px 11px;border-bottom:1px solid #f0f2f5;vertical-align:middle;}
+    .rm-track-table tr:last-child td{border-bottom:none;}
+    .rm-track-count{display:inline-block;background:#1A3ECA;color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;margin-right:6px;}
+    .rm-legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;font-size:10.5px;color:#65676b;}
+    .rm-legend-item{display:flex;align-items:center;gap:4px;}
+  </style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <div class="topnav-brand">INTEGRITY RISK &amp; COMPLIANCE</div>
+  <div class="topnav-item active" data-view="home">Home <span class="topnav-dot"></span></div>
+  <div class="topnav-item" data-view="none">Roles</div>
+  <div class="topnav-item" data-view="none">Obligations</div>
+  <div class="topnav-item" data-view="none">Escalation</div>
+  <div class="topnav-item" data-view="none">People</div>
+  <div class="topnav-item" data-view="track-owner">Track Owner <span class="topnav-dot"></span></div>
+  <div class="topnav-item" data-view="surface-owner">Surface Owner <span class="topnav-dot"></span></div>
+  <div class="topnav-item" data-view="none">Glossary</div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- HOME VIEW -->
+  <div class="view" id="view-home">
+    <div class="home-hero">
+      <div class="home-eyebrow">Integrity Risk &amp; Compliance / People &amp; Process</div>
+      <div class="home-title">Your guide to how IRC works —<br>and your role in it.</div>
+      <div class="home-desc">Everything you need to understand the IRC program, your responsibilities, and how to navigate compliance processes — organized by your role.</div>
+    </div>
+
+    <div class="role-section">
+      <div class="role-section-title">I am a…</div>
+      <div class="role-section-sub">Select your role to see what's most relevant to you.</div>
+      <div class="role-grid">
+        <div class="role-card" onclick="switchView('surface-owner')">
+          <div class="role-icon" style="background:#dce8ff;">🛡</div>
+          <div class="role-title">Surface Owner</div>
+          <div class="role-desc">You own a product surface with compliance obligations. See your requirements, timelines, and escalation paths.</div>
+        </div>
+        <div class="role-card" onclick="switchView('track-owner')">
+          <div class="role-icon" style="background:#ede9fe;">◎</div>
+          <div class="role-title">Track Owner</div>
+          <div class="role-desc">You manage a compliance track and coordinate across surface owners. See your oversight responsibilities and grade targets.</div>
+        </div>
+        <div class="role-card">
+          <div class="role-icon" style="background:#dcfce7;">◈</div>
+          <div class="role-title">Ops Owner</div>
+          <div class="role-desc">You manage day-to-day compliance operations and own the admin queue. See triage guidance and SLA requirements.</div>
+        </div>
+        <div class="role-card">
+          <div class="role-icon" style="background:#fef3c7;">✦</div>
+          <div class="role-title">Partner / New to IRC</div>
+          <div class="role-desc">You're new to the program or work cross-functionally with IRC. Get oriented with the essentials.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="snapshot-section">
+      <div class="snapshot-title">H1 2026 Snapshot</div>
+      <div class="snapshot-grid">
+        <div class="snap-card"><div class="snap-num">36</div><div class="snap-label">Active compliance obligations</div></div>
+        <div class="snap-card"><div class="snap-num">6</div><div class="snap-label">Compliance tracks in scope</div></div>
+        <div class="snap-card"><div class="snap-num">90+</div><div class="snap-label">Escalation decisions on record</div></div>
+        <div class="snap-card"><div class="snap-num">1,000+</div><div class="snap-label">IRC program participants</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRACK OWNER VIEW -->
+  <div class="view hidden" id="view-track-owner">
+    <div class="role-content-header">
+      <div class="role-breadcrumb" onclick="switchView('home')">← <span>Home</span> / Track Owner</div>
+      <div class="role-content-title">Track Owner</div>
+      <div class="role-content-sub">You oversee a compliance track, coordinate across surface owners, and own the grade health for your area.</div>
+    </div>
+    <div class="role-content-body">
+      <div class="quick-links">
+        <div class="quick-link">
+          <div class="ql-icon">▦</div>
+          <div class="ql-title">Track Health Dashboard</div>
+          <div class="ql-desc">View your track's current grade, score, and requirement status across all surfaces.</div>
+        </div>
+        <div class="quick-link">
+          <div class="ql-icon">⬆</div>
+          <div class="ql-title">Submit an Escalation</div>
+          <div class="ql-desc">Raise a compliance decision that needs cross-functional alignment to the IRC Escalation Hub.</div>
+        </div>
+        <div class="quick-link">
+          <div class="ql-icon">☰</div>
+          <div class="ql-title">Track Documentation</div>
+          <div class="ql-desc">Access your track's process docs, obligation library, and historical decisions.</div>
+        </div>
+      </div>
+
+      <div class="callout-box">
+        <div class="callout-label">Your Track This Cycle</div>
+        <div class="callout-text">Regulatory Compliance is currently graded <strong>A+</strong> (Score: 96). All 12 requirements are met and no past-due items. Next check-in: June 30. Keep maintaining this standard — track grades directly inform H1 executive reporting.</div>
+      </div>
+
+      <div class="checklist-section">
+        <div class="checklist-title">H1 Track Owner Checklist</div>
+        <div class="check-item">
+          <div class="check-box done">✓</div>
+          <div><div class="check-text">Complete track documentation review and update all obligation records</div><div class="check-due">Due Jun 30 · Completed Jun 18</div></div>
+        </div>
+        <div class="check-item">
+          <div class="check-box done">✓</div>
+          <div><div class="check-text">Conduct stakeholder alignment check-in with all surface owners</div><div class="check-due">Due Jun 30 · Completed Jun 22</div></div>
+        </div>
+        <div class="check-item">
+          <div class="check-box done">✓</div>
+          <div><div class="check-text">Verify all signals routed via RITE are acknowledged and triaged</div><div class="check-due">Due: Rolling · Last checked Jun 23</div></div>
+        </div>
+        <div class="check-item">
+          <div class="check-box"></div>
+          <div><div class="check-text">Submit H1 track summary to IRC Core for exec reporting</div><div class="check-due">Due Jul 7 · Pending</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SURFACE OWNER VIEW -->
+  <div class="view hidden" id="view-surface-owner">
+    <div class="role-content-header">
+      <div class="role-breadcrumb" onclick="switchView('home')">← <span>Home</span> / Surface Owner</div>
+      <div class="role-content-title">Surface Owner</div>
+      <div class="role-content-sub">You own a product surface with active compliance obligations. Your responsibilities span signal intake, documentation, and timely escalation.</div>
+    </div>
+    <div class="role-content-body">
+      <div class="quick-links">
+        <div class="quick-link">
+          <div class="ql-icon">⬆</div>
+          <div class="ql-title">Submit a Signal via RITE</div>
+          <div class="ql-desc">RITE is the single intake point for all regulatory signals. It routes automatically — you just describe what you observed.</div>
+        </div>
+        <div class="quick-link">
+          <div class="ql-icon">◎</div>
+          <div class="ql-title">My Obligations</div>
+          <div class="ql-desc">View the compliance obligations assigned to your surface, their deadlines, and current status.</div>
+        </div>
+        <div class="quick-link">
+          <div class="ql-icon">⚠</div>
+          <div class="ql-title">Escalation Guide</div>
+          <div class="ql-desc">Learn when and how to escalate — what qualifies, how routing works, and what to expect.</div>
+        </div>
+      </div>
+
+      <div class="callout-box">
+        <div class="callout-label">When to Use RITE</div>
+        <div class="callout-text">If you become aware of a regulatory signal — new legislation, enforcement action, compliance risk, or emerging threat — submit it via RITE immediately. You don't need to know which team owns it. RITE classifies and routes automatically. <strong>When in doubt, submit.</strong></div>
+      </div>
+
+      <div class="checklist-section">
+        <div class="checklist-title">Surface Owner Responsibilities — H1 2026</div>
+        <div class="check-item">
+          <div class="check-box done">✓</div>
+          <div><div class="check-text">Review your surface's assigned obligations and confirm ownership</div><div class="check-due">Due Jun 15 · Completed Jun 12</div></div>
+        </div>
+        <div class="check-item">
+          <div class="check-box done">✓</div>
+          <div><div class="check-text">Complete documentation for all P0 and P1 obligations</div><div class="check-due">Due Jun 20 · Completed Jun 19</div></div>
+        </div>
+        <div class="check-item">
+          <div class="check-box"></div>
+          <div><div class="check-text">Confirm no signals surfaced in the last 30 days are missing from RITE</div><div class="check-due">Due Jun 30 · In Progress</div></div>
+        </div>
+        <div class="check-item">
+          <div class="check-box"></div>
+          <div><div class="check-text">Attend surface owner check-in with Track Owner</div><div class="check-due">Due Jul 5 · Not Started</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+</div><!-- /main -->
+
+<!-- Disclaimer -->
+<div style="position:fixed;bottom:0;left:0;right:0;padding:5px 14px;background:rgba(248,247,245,0.96);border-top:1px solid #e8eaed;font-size:10px;color:#8a8d91;z-index:500;text-align:center;letter-spacing:.01em;">
+  Illustrative mockup — all names, data, and content are entirely fictional. No proprietary or confidential information is depicted.
+</div>
+
+<!-- Tour cursor -->
+<div id="tc"><div class="tcr"></div></div>
+
+<script>
+  // ── VIEW SWITCHING ──
+  const navItems = document.querySelectorAll('.topnav-item[data-view]');
+  const views    = document.querySelectorAll('.view');
+  const startView = new URLSearchParams(window.location.search).get('view');
+
+  function switchView(target) {
+    if (!target || target === 'none') return;
+    navItems.forEach(n => n.classList.remove('active'));
+    const an = document.querySelector(`.topnav-item[data-view="${target}"]`);
+    if (an) an.classList.add('active');
+    views.forEach(v => v.classList.add('hidden'));
+    const tv = document.getElementById('view-' + target);
+    if (tv) tv.classList.remove('hidden');
+  }
+
+  navItems.forEach(item => {
+    item.addEventListener('click', () => switchView(item.dataset.view));
+  });
+
+  // ── REGION FILTER ──
+  document.querySelectorAll('.rm-filter').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.querySelectorAll('.rm-filter').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.dataset.filter;
+      document.querySelectorAll('.rm-obl').forEach(obl => {
+        if (filter === 'all' || obl.dataset.region === filter) {
+          obl.classList.remove('hidden');
+        } else {
+          obl.classList.add('hidden');
+        }
+      });
+    });
+  });
+
+  // ── ANIMATED TOUR ──
+  const seq = ['track-owner', 'surface-owner', 'home'];
+  let idx = 0, alive = true, t;
+  const cur = document.getElementById('tc');
+
+  function tourStep() {
+    if (!alive) return;
+    const view = seq[idx % seq.length];
+    const el = document.querySelector(`.topnav-item[data-view="${view}"]`);
+    if (!el) { idx++; t = setTimeout(tourStep, 2800); return; }
+    const r = el.getBoundingClientRect();
+    cur.style.left = (r.left + r.width / 2) + 'px';
+    cur.style.top  = (r.top + r.height / 2) + 'px';
+    cur.style.opacity = '1';
+    setTimeout(() => {
+      if (!alive) return;
+      cur.classList.add('ck');
+      setTimeout(() => {
+        if (!alive) return;
+        cur.classList.remove('ck');
+        switchView(view);
+        idx++;
+        t = setTimeout(tourStep, 3000);
+      }, 220);
+    }, 680);
+  }
+
+  // If loaded with ?view=, jump straight to that view and skip the tour
+  if (startView) {
+    switchView(startView);
+    alive = false;
+  }
+  const ts = startView ? null : setTimeout(tourStep, 2000);
+  function stopTour() { alive=false; clearTimeout(t); if(ts) clearTimeout(ts); cur.style.opacity='0'; }
+  document.addEventListener('click', stopTour, {once:true});
+</script>
+</body>
+</html>

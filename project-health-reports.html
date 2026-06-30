@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monthly Program Health Reports (HPMs) — Evîn Cheikosman</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Evîn<span>.</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="index.html#projects">Projects</a></li>
+    <li><a href="mailto:sokiec@gmail.com">Contact</a></li>
+  </ul>
+</nav>
+
+<main>
+  <section class="project-hero">
+    <div class="container">
+      <a href="index.html" class="back-link">← All projects</a>
+      <span class="section-label">Project 05</span>
+      <h1 class="section-title" style="margin-top: 0.5rem;">Monthly Program Health Reports (HPMs)</h1>
+      <p style="color: var(--muted); margin-top: 0.25rem; font-size: 0.85rem; font-style: italic;">Happenings, People &amp; Moments</p>
+      <p style="color: var(--muted); margin-top: 0.75rem; max-width: 620px; font-size: 1.05rem;">
+        A monthly program health report — five consecutive editions, zero missed months — that became the org's primary accountability mechanism for 2,000+ regulatory requirements across 10+ jurisdictions.
+      </p>
+      <div class="project-meta">
+        <div class="meta-item">
+          <span class="meta-label">Editions Published</span>
+          <span class="meta-value">5 consecutive</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Requirements Tracked</span>
+          <span class="meta-value">2,000+</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Jurisdictions</span>
+          <span class="meta-value">10+</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Velocity Improvement</span>
+          <span class="meta-value">45 → 109 cleared/month</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <div class="project-body">
+
+        <h2><span class="icon">⚠</span> The Problem</h2>
+        <p>
+          A regulatory compliance portfolio of 2,000+ requirements across 10+ jurisdictions needed
+          regular health monitoring. The data lived in iWAM — Meta's internal system for tracking
+          integrity obligations and requirements — but it existed at the row level. Each obligation
+          was a record, each requirement was a record, and there was no way to look across all of
+          it and understand what the program was actually doing.
+        </p>
+        <p>
+          Getting a useful picture required analysis, not just extraction. Every month I'd pull the
+          raw data and do the work myself: aggregate obligation counts by region and priority,
+          calculate intake velocity, identify which risk areas — child and youth safety, fraud and
+          scams, harmful and illegal content, novel technologies — were accelerating or stalling,
+          and map patterns across all of those dimensions simultaneously to produce something a VP
+          could actually act on. Leadership had no reliable way to ask: where do we stand? What's
+          been completed this month? Is the program accelerating or stalling? Those questions
+          required someone to sit down and derive the answers — and that someone was me.
+        </p>
+
+        <h2><span class="icon">⚙</span> What I Built</h2>
+        <p>
+          A monthly program health report — called the HPM (Happenings, People &amp; Moments) — with a consistent structure, published every month without exception. Each edition covers:
+        </p>
+        <ul>
+          <li>Portfolio summary — total obligations, requirements, and P0 breakdown</li>
+          <li>Execution progress — what was completed this month</li>
+          <li>On-track status for top priority obligations with percentage readiness</li>
+          <li>Requirement growth analysis — how and why the portfolio is expanding</li>
+          <li>Legal review pipeline — backlog status and throughput trends</li>
+          <li>Velocity metrics — requirements cleared per month, trend over time</li>
+          <li>Track grades — performance across each integrity work stream</li>
+          <li>Resources and contacts — People &amp; Process, IRC Escalation Hub, RITE, iWAM</li>
+          <li>Deep-dives — ad-hoc analysis on high-risk obligations and upcoming enforcement deadlines</li>
+        </ul>
+
+        <div class="mockup-frame">
+          <div class="mockup-chrome">
+            <div class="mockup-dots"><span></span><span></span><span></span></div>
+            <div class="mockup-url">workplace.meta.com / IRC Program Team / HPM Reports</div>
+            <div class="mockup-label">Interface mockup</div>
+          </div>
+          <iframe src="mockup-hpm.html" class="mockup-iframe" title="Monthly HPM Workplace post mockup"></iframe>
+        </div>
+        <p class="mockup-caption"><span class="mockup-live-dot"></span> Interactive demo — an animated cursor shows you around, or scroll and click the post yourself</p>
+
+        <h2><span class="icon">◎</span> Reach &amp; Distribution</h2>
+        <p>
+          Each edition was published as a pinned Workplace post, tagged to VP leads, legal and
+          policy POCs, product program managers, and surface owners across all regions.
+          VP-level stakeholders referenced it in leadership reviews; partner teams used it for
+          their own cross-functional briefings. The structure — Happenings, People, and Moments
+          — was designed to be scannable in under a minute.
+        </p>
+        <p>
+          The data powering each edition was pulled manually from iWAM and cross-referenced
+          across spreadsheets and track updates until I built the <a href="project-compliance-dashboard.html">iWAM Admin Dashboard</a>
+          (Project 06) to automate that layer. The HPM came first; the dashboard was built
+          to serve it.
+        </p>
+
+        <h2><span class="icon">↑</span> Impact</h2>
+        <div class="impact-grid">
+          <div class="impact-item">
+            <span class="impact-number">5</span>
+            <span class="impact-label">Consecutive editions — zero missed months</span>
+          </div>
+          <div class="impact-item">
+            <span class="impact-number">45→109</span>
+            <span class="impact-label">Requirements cleared per month (142% increase)</span>
+          </div>
+          <div class="impact-item">
+            <span class="impact-number">89→62%</span>
+            <span class="impact-label">Legal backlog pending (driven by visibility)</span>
+          </div>
+          <div class="impact-item">
+            <span class="impact-number">2,000+</span>
+            <span class="impact-label">Requirements tracked across 10+ jurisdictions</span>
+          </div>
+        </div>
+
+        <h2><span class="icon">✦</span> What I Learned</h2>
+        <p>
+          Consistent delivery is its own product. Once the HPM was publishing on a reliable monthly cadence — five editions,
+          five months, no gaps — teams started planning their execution cycles around it — completing
+          requirements before the report dropped, not after, because they knew it would surface
+          publicly. That's a behavioral shift. But the content itself also mattered independently:
+          the HPM synthesized 2,000+ requirements worth of iWAM data into three or four program-level
+          insights that VPs could cite in leadership reviews and partner teams could reference in
+          their own cross-functional briefings. The raw data was available to anyone who wanted to
+          pull it from iWAM. What wasn't available was the interpretation — what the numbers meant
+          in aggregate, what was accelerating and what was stalling, and what it implied about the
+          program's trajectory. That synthesis was what people actually depended on. The cadence made
+          them expect it. The content quality made them trust it.
+        </p>
+        <p>
+          The hardest editorial decision was what to do when the data implicated a partner team.
+          When the legal review backlog appeared in the numbers, publishing the raw count —
+          "47 of 412 reviews completed this cycle" — would have signaled to the org that legal
+          was the bottleneck, which was true but incomplete. The actual constraint was bandwidth,
+          not effort or priority. Learning to write "continued throughput is needed to clear the
+          backlog ahead of H2 deadlines" instead of leading with the gap kept the report trusted
+          by all sides. Maintaining accountability without assigning blame is a distinct skill from
+          data analysis, and it's the one that determined whether people actually read the next edition.
+        </p>
+        <p>
+          Data without interpretation is just reporting. The requirement count was rising every
+          month — which could reasonably read as the program falling behind. The real story was
+          that the regulatory environment was expanding and the program was keeping pace. Writing
+          that distinction into every edition required understanding the legislative context, not
+          just the metrics. The most valuable thing the HPM did was give leadership a coherent
+          narrative, not a spreadsheet.
+        </p>
+
+        <div class="divider"></div>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+          <a href="index.html#projects" class="btn btn-primary">← All Projects</a>
+          <a href="about.html" class="btn btn-secondary">About Me</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; width: 100%;">
+    <span class="footer-name">Evîn Cheikosman</span>
+    <div class="footer-links">
+      <a href="about.html">About</a>
+      <a href="index.html#projects">Projects</a>
+      <a href="https://linkedin.com/in/evin-cheikosman" target="_blank">LinkedIn</a>
+      <a href="mailto:sokiec@gmail.com">Email</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

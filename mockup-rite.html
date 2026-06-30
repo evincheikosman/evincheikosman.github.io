@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RITE — Risk Intake &amp; Triage</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#fff;font-size:13.5px;color:#1c1e21;display:flex;height:100vh;overflow:hidden;}
+
+    /* ── SIDEBAR ── */
+    .sidebar{width:192px;background:#f0f2f5;border-right:1px solid #dde0e4;display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
+    .sidebar-logo{padding:13px 14px;border-bottom:1px solid #dde0e4;display:flex;align-items:center;gap:9px;flex-shrink:0;}
+    .logo-icon{width:28px;height:28px;background:#1A3ECA;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:9px;flex-shrink:0;}
+    .logo-text{font-weight:700;font-size:14px;letter-spacing:-.01em;}
+    .logo-sub{font-size:10px;color:#65676b;}
+    .nav-section{padding:10px 8px 2px;}
+    .nav-label{font-size:10px;font-weight:700;color:#8a8d91;text-transform:uppercase;letter-spacing:.1em;padding:0 6px;margin-bottom:3px;}
+    .nav-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;color:#1c1e21;font-size:12.5px;cursor:pointer;margin-bottom:1px;}
+    .nav-item:hover{background:#e4e6e9;}
+    .nav-item.active{background:#dce8ff;color:#1A3ECA;font-weight:600;}
+    .nav-item .ni{font-size:12px;opacity:.6;width:14px;text-align:center;}
+    .nav-item.active .ni{opacity:1;}
+    .nav-dot{width:5px;height:5px;border-radius:50%;background:#1A3ECA;margin-left:auto;flex-shrink:0;opacity:.55;animation:dp 2.5s ease infinite;}
+    @keyframes dp{0%,100%{opacity:.55;transform:scale(1)}50%{opacity:.15;transform:scale(.65)}}
+
+    /* ── MAIN ── */
+    .main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+    .view{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+    .view.hidden{display:none;}
+
+    /* ── SHARED ── */
+    .page-header{padding:18px 24px 14px;border-bottom:1px solid #e8eaed;background:#fff;flex-shrink:0;}
+    .page-title{font-size:17px;font-weight:700;letter-spacing:-.02em;}
+    .page-tagline{font-size:12px;font-weight:600;color:#444;margin-top:2px;}
+    .page-desc{font-size:12px;color:#65676b;margin-top:5px;max-width:520px;line-height:1.55;}
+    .field{margin-bottom:12px;}
+    .field-label{display:block;font-size:12px;font-weight:600;margin-bottom:4px;}
+    .field-hint{font-size:11px;color:#8a8d91;margin-bottom:5px;}
+    .field-input{width:100%;border:1px solid #ccd0d5;border-radius:6px;padding:7px 10px;font-size:12.5px;background:#fafbfc;font-family:inherit;color:#1c1e21;}
+    .field-input::placeholder{color:#bcc0c4;}
+    .field-textarea{width:100%;border:1px solid #ccd0d5;border-radius:6px;padding:7px 10px;font-size:12.5px;background:#fafbfc;height:100px;resize:none;font-family:inherit;color:#1c1e21;line-height:1.5;}
+    .field-textarea::placeholder{color:#bcc0c4;}
+    .word-count{font-size:11px;color:#8a8d91;text-align:right;margin-top:3px;}
+
+    /* ── SUBMIT VIEW ── */
+    .form-body{flex:1;display:flex;gap:0;overflow:hidden;}
+    .form-main{flex:1;padding:18px 24px;overflow-y:auto;}
+    .form-card{border:1px solid #dde0e4;border-radius:8px;overflow:hidden;}
+    .card-head{background:#1A3ECA;color:#fff;padding:10px 16px;font-size:13.5px;font-weight:700;}
+    .card-body{padding:16px;}
+    .card-instruction{font-size:12.5px;color:#65676b;margin-bottom:14px;line-height:1.5;}
+    .card-footer{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-top:1px solid #f0f2f5;background:#fafbfc;}
+    .btn-ghost{font-size:13px;color:#65676b;background:none;border:none;cursor:pointer;font-family:inherit;}
+    .btn-primary{background:#1A3ECA;color:white;border:none;border-radius:6px;padding:7px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+
+    /* ── PROGRESS PANEL ── */
+    .progress-panel{width:150px;border-left:1px solid #e8eaed;padding:18px 14px;flex-shrink:0;background:#fafbfc;}
+    .progress-heading{font-size:10.5px;font-weight:700;color:#8a8d91;text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;}
+    .step{display:flex;align-items:flex-start;gap:9px;margin-bottom:12px;}
+    .step-dot{width:15px;height:15px;border-radius:50%;border:2px solid #ccd0d5;flex-shrink:0;margin-top:1px;}
+    .step-dot.active{background:#1A3ECA;border-color:#1A3ECA;}
+    .step-dot.done{background:#22c55e;border-color:#22c55e;}
+    .step-text{font-size:12.5px;color:#8a8d91;line-height:1.3;}
+    .step-text.active{color:#1A3ECA;font-weight:700;}
+    .step-text.done{color:#16a34a;}
+    .ai-note{margin-top:20px;padding:10px;background:#eef2ff;border-radius:6px;border:1px solid #c7d2fe;}
+    .ai-note-label{font-size:10px;font-weight:700;color:#1A3ECA;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
+    .ai-note-text{font-size:11.5px;color:#3730a3;line-height:1.45;}
+
+    /* ── AI ANALYSIS VIEW ── */
+    .ai-body{flex:1;display:flex;gap:0;overflow:hidden;}
+    .ai-main{flex:1;padding:18px 24px;overflow-y:auto;}
+    .ai-success-banner{background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+    .ai-check{width:28px;height:28px;border-radius:50%;background:#22c55e;color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+    .ai-success-label{font-size:13.5px;font-weight:700;color:#15803d;}
+    .ai-success-sub{font-size:12px;color:#166534;margin-top:1px;}
+
+    .ai-result-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;}
+    .ai-result-card{background:#fff;border:1px solid #e8eaed;border-radius:8px;padding:13px 16px;}
+    .ai-result-label{font-size:10.5px;font-weight:700;color:#8a8d91;text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px;}
+    .ai-result-value{font-size:13.5px;font-weight:700;color:#1c1e21;}
+    .ai-result-sub{font-size:11.5px;color:#65676b;margin-top:2px;}
+    .risk-high{color:#dc2626;}
+    .confidence-bar-wrap{background:#e8eaed;border-radius:4px;height:5px;margin-top:8px;}
+    .confidence-bar{background:#1A3ECA;border-radius:4px;height:5px;width:94%;}
+
+    .routing-result{background:#f8f9ff;border:1px solid #c7d2fe;border-radius:8px;padding:14px 16px;margin-bottom:18px;}
+    .routing-result-label{font-size:11px;font-weight:700;color:#3730a3;text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;}
+    .routing-path{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#1c1e21;}
+    .routing-arrow{color:#8a8d91;}
+    .routing-badge-sm{display:inline-block;padding:3px 10px;border-radius:10px;font-size:11.5px;font-weight:700;background:#dce8ff;color:#1A3ECA;}
+
+    .downstream-box{background:#fff;border:1px solid #e8eaed;border-radius:8px;padding:13px 16px;margin-bottom:18px;}
+    .downstream-label{font-size:11px;font-weight:700;color:#8a8d91;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;}
+    .downstream-item{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #f0f2f5;}
+    .downstream-item:last-child{border-bottom:none;}
+    .ds-icon{width:22px;height:22px;border-radius:4px;background:#eef2ff;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;}
+    .ds-name{font-size:12.5px;font-weight:600;}
+    .ds-status{font-size:11.5px;color:#65676b;margin-left:auto;}
+    .ds-creating{color:#d97706;font-size:11.5px;}
+
+    .ai-actions{display:flex;gap:10px;}
+    .btn-confirm{background:#1A3ECA;color:#fff;border:none;border-radius:6px;padding:8px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+    .btn-adjust{background:none;border:1px solid #ccd0d5;border-radius:6px;padding:8px 20px;font-size:13px;color:#65676b;cursor:pointer;font-family:inherit;}
+
+    .ai-panel{width:150px;border-left:1px solid #e8eaed;padding:18px 14px;flex-shrink:0;background:#fafbfc;}
+    .ai-panel-heading{font-size:10.5px;font-weight:700;color:#8a8d91;text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;}
+    .ai-step-done{display:flex;align-items:flex-start;gap:9px;margin-bottom:12px;}
+
+    /* ── MY SIGNALS VIEW ── */
+    .signals-body{flex:1;overflow-y:auto;padding:14px 24px;}
+    .signals-filter{display:flex;gap:8px;margin-bottom:14px;}
+    .filter-btn{padding:5px 14px;border-radius:16px;border:1px solid #ccd0d5;font-size:12px;cursor:pointer;background:#fff;color:#65676b;}
+    .filter-btn.active{background:#dce8ff;border-color:#1A3ECA;color:#1A3ECA;font-weight:600;}
+    table.sig-table{width:100%;border-collapse:collapse;font-size:12px;}
+    .sig-table th{text-align:left;padding:7px 10px;background:#f3f4f6;font-size:11px;font-weight:700;color:#8a8d91;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid #e8eaed;}
+    .sig-table td{padding:9px 10px;border-bottom:1px solid #f0f2f5;vertical-align:middle;}
+    .sig-table tr:hover td{background:#fafbfc;}
+    .sig-title{font-weight:600;color:#1c1e21;}
+    .sig-sub{font-size:11px;color:#8a8d91;margin-top:1px;}
+    .sig-type{font-size:11.5px;}
+    .pill{display:inline-block;padding:2px 9px;border-radius:10px;font-size:11px;font-weight:600;}
+    .pill-blue{background:#dce8ff;color:#1A3ECA;}
+    .pill-green{background:#dcfce7;color:#16a34a;}
+    .pill-yellow{background:#fef3c7;color:#d97706;}
+    .pill-gray{background:#f0f2f5;color:#65676b;}
+
+    /* ── REVIEW QUEUE VIEW ── */
+    .queue-body{flex:1;overflow-y:auto;padding:14px 24px;}
+    .queue-search input{width:100%;border:1px solid #ccd0d5;border-radius:6px;padding:7px 12px;font-size:12.5px;background:#fafbfc;font-family:inherit;color:#1c1e21;margin-bottom:14px;}
+    .queue-section-hd{font-size:12px;font-weight:700;color:#65676b;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+    .queue-count{background:#e8eaed;color:#65676b;border-radius:10px;padding:1px 8px;font-size:11px;}
+    table.q-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:20px;}
+    .q-table th{text-align:left;padding:7px 10px;background:#f3f4f6;font-size:11px;font-weight:700;color:#8a8d91;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid #e8eaed;}
+    .q-table td{padding:8px 10px;border-bottom:1px solid #f0f2f5;vertical-align:middle;}
+    .q-table tr:hover td{background:#fafbfc;}
+    .q-topic{font-weight:600;color:#1c1e21;}
+    .q-sub{font-size:11px;color:#8a8d91;margin-top:1px;}
+    .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10.5px;font-weight:700;}
+    .badge-p0{background:#fee2e2;color:#dc2626;}
+    .badge-p1{background:#fef3c7;color:#d97706;}
+    .badge-p2{background:#f0f2f5;color:#65676b;}
+    .q-actions a{color:#1A3ECA;font-size:11.5px;cursor:pointer;margin-right:8px;}
+
+    /* ── TOUR CURSOR ── */
+    #tc{position:fixed;width:22px;height:22px;border-radius:50%;background:rgba(26,62,202,.18);border:2px solid #1A3ECA;transform:translate(-50%,-50%);pointer-events:none;z-index:9999;opacity:0;transition:left .55s cubic-bezier(.4,0,.2,1),top .55s cubic-bezier(.4,0,.2,1),opacity .3s;}
+    #tc.ck{background:rgba(26,62,202,.38);transform:translate(-50%,-50%) scale(.65);transition:transform .15s,background .15s;}
+    .tcr{position:absolute;inset:-7px;border-radius:50%;border:1.5px solid rgba(26,62,202,.3);animation:tr 1.4s ease infinite;}
+    @keyframes tr{0%{transform:scale(.7);opacity:.9}100%{transform:scale(1.9);opacity:0}}
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">RITE</div>
+    <div>
+      <div class="logo-text">RITE</div>
+      <div class="logo-sub">Risk Intake &amp; Triage</div>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Signals</div>
+    <div class="nav-item active" data-view="submit"><span class="ni">⬆</span> Submit Signal <span class="nav-dot"></span></div>
+    <div class="nav-item" data-view="my-signals"><span class="ni">◎</span> My Signals <span class="nav-dot"></span></div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">People &amp; Process</div>
+    <div class="nav-item" data-view="none"><span class="ni">☰</span> Triage Playbook</div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Admin</div>
+    <div class="nav-item" data-view="review-queue"><span class="ni">◫</span> Review Queue <span class="nav-dot"></span></div>
+    <div class="nav-item" data-view="none"><span class="ni">↗</span> Intelligence</div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- SUBMIT VIEW (step 1: describe signal) -->
+  <div class="view" id="view-submit">
+    <div class="page-header">
+      <div class="page-title">Regulatory Intake &amp; Triage (RITE)</div>
+      <div class="page-tagline">The single front door for all regulatory pressure signals.</div>
+      <div class="page-desc">Describe what you observed. RITE classifies it, routes it to the right system, and creates the task on your behalf.</div>
+    </div>
+    <div class="form-body">
+      <div class="form-main">
+        <div class="form-card">
+          <div class="card-head">Step 1 of 5 — Describe Signal</div>
+          <div class="card-body">
+            <div class="card-instruction">Describe what happened and why it matters. RITE handles classification, routing, and assignment automatically.</div>
+            <div class="field">
+              <label class="field-label">Signal Topic</label>
+              <input class="field-input" type="text" placeholder="e.g., State AG Threatens Litigation Over Youth Safety Practices" />
+            </div>
+            <div class="field">
+              <label class="field-label">Signal Description</label>
+              <textarea class="field-textarea" placeholder="e.g., The state attorney general held a press conference announcing intent to pursue litigation over platform safety practices. A formal complaint has not been filed yet, but a 90-day window for compliance discussions was indicated..."></textarea>
+              <div class="word-count">0 / 30 words minimum</div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <button class="btn-ghost">Save as Draft</button>
+            <button class="btn-primary" id="btn-analyze">Analyze Signal →</button>
+          </div>
+        </div>
+      </div>
+      <div class="progress-panel">
+        <div class="progress-heading">Progress</div>
+        <div class="step"><div class="step-dot active"></div><div class="step-text active">Describe Signal</div></div>
+        <div class="step"><div class="step-dot"></div><div class="step-text">AI Analysis</div></div>
+        <div class="step"><div class="step-dot"></div><div class="step-text">Signal Details</div></div>
+        <div class="step"><div class="step-dot"></div><div class="step-text">Triage</div></div>
+        <div class="step"><div class="step-dot"></div><div class="step-text">Submit</div></div>
+        <div class="ai-note">
+          <div class="ai-note-label">AI-Powered</div>
+          <div class="ai-note-text">Signal is classified and routed to the correct downstream system automatically.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI ANALYSIS VIEW (step 2) -->
+  <div class="view hidden" id="view-ai-analysis">
+    <div class="page-header">
+      <div class="page-title">Regulatory Intake &amp; Triage (RITE)</div>
+      <div class="page-tagline">AI Classification Complete</div>
+    </div>
+    <div class="ai-body">
+      <div class="ai-main">
+        <div class="ai-success-banner">
+          <div class="ai-check">✓</div>
+          <div>
+            <div class="ai-success-label">Signal Analyzed Successfully</div>
+            <div class="ai-success-sub">Classification complete · Routing determined · Downstream task queued</div>
+          </div>
+        </div>
+
+        <div class="ai-result-grid">
+          <div class="ai-result-card">
+            <div class="ai-result-label">Signal Type</div>
+            <div class="ai-result-value">Regulatory Pressure</div>
+            <div class="ai-result-sub">Enforcement Action — State AG Litigation Threat</div>
+          </div>
+          <div class="ai-result-card">
+            <div class="ai-result-label">Risk Level</div>
+            <div class="ai-result-value risk-high">High</div>
+            <div class="ai-result-sub">Litigation threat · Public announcement · 90-day window</div>
+          </div>
+          <div class="ai-result-card">
+            <div class="ai-result-label">Jurisdiction</div>
+            <div class="ai-result-value">NORAM</div>
+            <div class="ai-result-sub">US State — Regulatory Authority</div>
+          </div>
+          <div class="ai-result-card">
+            <div class="ai-result-label">AI Confidence</div>
+            <div class="ai-result-value">94%</div>
+            <div class="confidence-bar-wrap"><div class="confidence-bar"></div></div>
+          </div>
+        </div>
+
+        <div class="routing-result">
+          <div class="routing-result-label">Determined Routing Path</div>
+          <div class="routing-path">
+            RITE <span class="routing-arrow">→</span> <span class="routing-badge-sm">IRC Escalation Hub</span> <span class="routing-arrow">→</span> L1 SteerCo (Legal &amp; Policy)
+          </div>
+          <div style="font-size:11.5px;color:#65676b;margin-top:8px;line-height:1.5;">This signal meets L1 threshold: active litigation threat from a state regulatory authority. Cross-functional decision required within 90-day window.</div>
+        </div>
+
+        <div class="downstream-box">
+          <div class="downstream-label">Downstream Actions</div>
+          <div class="downstream-item">
+            <div class="ds-icon">◎</div>
+            <div>
+              <div class="ds-name">Policy Tracker</div>
+              <div class="ds-sub" style="font-size:11px;color:#8a8d91;">Creating task: "NORAM State AG Enforcement — Youth Safety"</div>
+            </div>
+            <div class="ds-creating">Creating…</div>
+          </div>
+          <div class="downstream-item">
+            <div class="ds-icon">⬆</div>
+            <div>
+              <div class="ds-name">IRC Escalation Hub</div>
+              <div class="ds-sub" style="font-size:11px;color:#8a8d91;">Draft escalation topic queued for admin review</div>
+            </div>
+            <div class="ds-status">Queued</div>
+          </div>
+          <div class="downstream-item">
+            <div class="ds-icon">◉</div>
+            <div>
+              <div class="ds-name">GChat Notification</div>
+              <div class="ds-sub" style="font-size:11px;color:#8a8d91;">IRC team + Legal leads notified of High-priority signal</div>
+            </div>
+            <div class="ds-status" style="color:#22c55e;">Sent ✓</div>
+          </div>
+        </div>
+
+        <div class="ai-actions">
+          <button class="btn-confirm">Confirm Routing →</button>
+          <button class="btn-adjust">Adjust Classification</button>
+        </div>
+      </div>
+      <div class="ai-panel">
+        <div class="ai-panel-heading">Progress</div>
+        <div class="step"><div class="step-dot done"></div><div class="step-text done">Describe Signal</div></div>
+        <div class="step"><div class="step-dot active"></div><div class="step-text active">AI Analysis</div></div>
+        <div class="step"><div class="step-dot"></div><div class="step-text">Signal Details</div></div>
+        <div class="step"><div class="step-dot"></div><div class="step-text">Triage</div></div>
+        <div class="step"><div class="step-dot"></div><div class="step-text">Submit</div></div>
+        <div class="ai-note" style="margin-top:20px;">
+          <div class="ai-note-label">Next Step</div>
+          <div class="ai-note-text">Confirm routing or adjust — then add signal details and submit.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MY SIGNALS VIEW -->
+  <div class="view hidden" id="view-my-signals">
+    <div class="page-header">
+      <div class="page-title">My Signals</div>
+      <div class="page-desc">Signals you've submitted — status, routing, and downstream tracking all in one place.</div>
+    </div>
+    <div class="signals-body">
+      <div class="signals-filter">
+        <div class="filter-btn active">All (6)</div>
+        <div class="filter-btn">In Review (2)</div>
+        <div class="filter-btn">Routed (3)</div>
+        <div class="filter-btn">Resolved (1)</div>
+      </div>
+      <table class="sig-table">
+        <thead>
+          <tr>
+            <th>Signal</th>
+            <th>Type</th>
+            <th>Priority</th>
+            <th>Routing</th>
+            <th>Status</th>
+            <th>Submitted</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="sig-title">State AG Litigation Threat – Youth Safety</div><div class="sig-sub">Ref #SIG-0214</div></td>
+            <td><div class="sig-type">Regulatory Pressure</div></td>
+            <td><span class="pill" style="background:#fee2e2;color:#dc2626;">High</span></td>
+            <td><span class="pill pill-blue">IRC Escalation Hub</span></td>
+            <td><span class="pill pill-yellow">In Review</span></td>
+            <td style="font-size:11.5px;color:#8a8d91;">Jun 20</td>
+          </tr>
+          <tr>
+            <td><div class="sig-title">New EU AI Act Requirements – Product Scope</div><div class="sig-sub">Ref #SIG-0208</div></td>
+            <td><div class="sig-type">Emerging Regulation</div></td>
+            <td><span class="pill" style="background:#fef3c7;color:#d97706;">Medium</span></td>
+            <td><span class="pill pill-blue">Policy Tracker</span></td>
+            <td><span class="pill pill-green">Routed</span></td>
+            <td style="font-size:11.5px;color:#8a8d91;">Jun 12</td>
+          </tr>
+          <tr>
+            <td><div class="sig-title">FTC Inquiry – Advertising Targeting Practices</div><div class="sig-sub">Ref #SIG-0201</div></td>
+            <td><div class="sig-type">Enforcement Action</div></td>
+            <td><span class="pill" style="background:#fee2e2;color:#dc2626;">High</span></td>
+            <td><span class="pill pill-blue">Legal Review</span></td>
+            <td><span class="pill pill-green">Routed</span></td>
+            <td style="font-size:11.5px;color:#8a8d91;">Jun 3</td>
+          </tr>
+          <tr>
+            <td><div class="sig-title">APAC Data Localization – New Legislative Draft</div><div class="sig-sub">Ref #SIG-0195</div></td>
+            <td><div class="sig-type">Legislative Update</div></td>
+            <td><span class="pill" style="background:#fef3c7;color:#d97706;">Medium</span></td>
+            <td><span class="pill pill-blue">Policy Tracker</span></td>
+            <td><span class="pill pill-green">Routed</span></td>
+            <td style="font-size:11.5px;color:#8a8d91;">May 28</td>
+          </tr>
+          <tr>
+            <td><div class="sig-title">UK Online Safety Act – Compliance Gap Assessment</div><div class="sig-sub">Ref #SIG-0188</div></td>
+            <td><div class="sig-type">Regulatory Pressure</div></td>
+            <td><span class="pill" style="background:#fef3c7;color:#d97706;">Medium</span></td>
+            <td><span class="pill pill-blue">Compliance System</span></td>
+            <td><span class="pill pill-yellow">In Review</span></td>
+            <td style="font-size:11.5px;color:#8a8d91;">May 20</td>
+          </tr>
+          <tr>
+            <td><div class="sig-title">LATAM Antitrust Investigation – Ads Market</div><div class="sig-sub">Ref #SIG-0177</div></td>
+            <td><div class="sig-type">Enforcement Action</div></td>
+            <td><span class="pill" style="background:#fee2e2;color:#dc2626;">High</span></td>
+            <td><span class="pill pill-blue">IRC Escalation Hub</span></td>
+            <td><span class="pill pill-gray">Resolved ✓</span></td>
+            <td style="font-size:11.5px;color:#8a8d91;">May 5</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- REVIEW QUEUE VIEW -->
+  <div class="view hidden" id="view-review-queue">
+    <div class="page-header">
+      <div class="page-title">Admin Review Queue</div>
+      <div class="page-desc">Incoming RITE signals pending triage — assign P-level, confirm routing, and update status.</div>
+    </div>
+    <div class="queue-body">
+      <div class="queue-search"><input placeholder="Search by title, submitter, type, region, P-level..." /></div>
+
+      <div class="queue-section-hd">▾ Awaiting Triage <span class="queue-count">5</span></div>
+      <table class="q-table">
+        <thead>
+          <tr>
+            <th>Signal</th>
+            <th>Type</th>
+            <th>Jurisdiction</th>
+            <th>Priority</th>
+            <th>Submitted By</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="q-topic">State AG Litigation Threat – Youth Safety Practices</div><div class="q-sub">Ref #SIG-0214 · Jun 20 · AI: 94% confidence</div></td>
+            <td style="font-size:12px;">Regulatory Pressure</td>
+            <td style="font-size:12px;">NORAM</td>
+            <td><span class="badge badge-p0">P0</span></td>
+            <td style="font-size:12px;">A. Moreno</td>
+            <td><span class="pill pill-yellow" style="font-size:11px;">Pending</span></td>
+            <td class="q-actions"><a>Assign</a><a>Route</a></td>
+          </tr>
+          <tr>
+            <td><div class="q-topic">DMA Non-Compliance Risk – Gatekeeper Designation</div><div class="q-sub">Ref #SIG-0213 · Jun 19 · AI: 89% confidence</div></td>
+            <td style="font-size:12px;">Legislative Update</td>
+            <td style="font-size:12px;">EMEA</td>
+            <td><span class="badge badge-p1">P1</span></td>
+            <td style="font-size:12px;">K. Ferrara</td>
+            <td><span class="pill pill-yellow" style="font-size:11px;">Pending</span></td>
+            <td class="q-actions"><a>Assign</a><a>Route</a></td>
+          </tr>
+          <tr>
+            <td><div class="q-topic">APAC Platform Data Localization – New Draft</div><div class="q-sub">Ref #SIG-0212 · Jun 17 · AI: 91% confidence</div></td>
+            <td style="font-size:12px;">Emerging Regulation</td>
+            <td style="font-size:12px;">APAC</td>
+            <td><span class="badge badge-p1">P1</span></td>
+            <td style="font-size:12px;">T. Nguyen</td>
+            <td><span class="pill pill-blue" style="font-size:11px;">In Review</span></td>
+            <td class="q-actions"><a>Assign</a><a>Route</a></td>
+          </tr>
+          <tr>
+            <td><div class="q-topic">Coordinated Inauthentic Behavior – Enforcement Pattern</div><div class="q-sub">Ref #SIG-0211 · Jun 16 · AI: 87% confidence</div></td>
+            <td style="font-size:12px;">Compliance Risk</td>
+            <td style="font-size:12px;">Global</td>
+            <td><span class="badge badge-p1">P1</span></td>
+            <td style="font-size:12px;">D. Walsh</td>
+            <td><span class="pill pill-blue" style="font-size:11px;">In Review</span></td>
+            <td class="q-actions"><a>Assign</a><a>Route</a></td>
+          </tr>
+          <tr>
+            <td><div class="q-topic">LATAM Antitrust Filing – Competitive Practices</div><div class="q-sub">Ref #SIG-0210 · Jun 14 · AI: 93% confidence</div></td>
+            <td style="font-size:12px;">Enforcement Action</td>
+            <td style="font-size:12px;">LATAM</td>
+            <td><span class="badge badge-p2">P2</span></td>
+            <td style="font-size:12px;">R. Stavros</td>
+            <td><span class="pill pill-green" style="font-size:11px;">Routed ✓</span></td>
+            <td class="q-actions"><a>View</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- Disclaimer -->
+<div style="position:fixed;bottom:0;left:0;right:0;padding:5px 14px;background:rgba(248,249,251,0.96);border-top:1px solid #e8eaed;font-size:10px;color:#8a8d91;z-index:500;text-align:center;letter-spacing:.01em;">
+  Illustrative mockup — all names, data, and content are entirely fictional. No proprietary or confidential information is depicted.
+</div>
+
+<!-- Tour cursor -->
+<div id="tc"><div class="tcr"></div></div>
+
+<script>
+  // ── VIEW SWITCHING ──
+  const navItems = document.querySelectorAll('.nav-item[data-view]');
+  const views    = document.querySelectorAll('.view');
+
+  function switchView(target) {
+    if (!target || target === 'none') return;
+    navItems.forEach(n => n.classList.remove('active'));
+    const an = document.querySelector(`.nav-item[data-view="${target}"]`);
+    if (an) an.classList.add('active');
+    views.forEach(v => v.classList.add('hidden'));
+    const tv = document.getElementById('view-' + target);
+    if (tv) tv.classList.remove('hidden');
+  }
+
+  navItems.forEach(item => {
+    item.addEventListener('click', () => switchView(item.dataset.view));
+  });
+
+  // "Analyze Signal" button jumps to AI analysis view
+  document.getElementById('btn-analyze').addEventListener('click', () => switchView('ai-analysis'));
+
+  // ── ANIMATED TOUR ──
+  const seq = ['ai-analysis','my-signals','review-queue','submit'];
+  let idx = 0, alive = true, t;
+  const cur = document.getElementById('tc');
+
+  // Map "ai-analysis" to the Submit nav item for cursor positioning
+  // (no sidebar nav for ai-analysis — it's triggered by "Analyze Signal" button)
+  const navMap = {
+    'ai-analysis': 'submit',
+    'my-signals':  'my-signals',
+    'review-queue':'review-queue',
+    'submit':      'submit'
+  };
+
+  function tourStep() {
+    if (!alive) return;
+    const view = seq[idx % seq.length];
+    const navTarget = navMap[view] || view;
+    const el = document.querySelector(`.nav-item[data-view="${navTarget}"]`);
+
+    if (!el) { idx++; t = setTimeout(tourStep, 2800); return; }
+
+    const r = el.getBoundingClientRect();
+    cur.style.left = (r.left + r.width * .62) + 'px';
+    cur.style.top  = (r.top + r.height / 2) + 'px';
+    cur.style.opacity = '1';
+
+    setTimeout(() => {
+      if (!alive) return;
+      cur.classList.add('ck');
+      setTimeout(() => {
+        if (!alive) return;
+        cur.classList.remove('ck');
+        switchView(view);
+        idx++;
+        t = setTimeout(tourStep, 2700);
+      }, 220);
+    }, 680);
+  }
+
+  const ts = setTimeout(tourStep, 2000);
+  function stopTour() { alive=false; clearTimeout(t); clearTimeout(ts); cur.style.opacity='0'; }
+  document.addEventListener('click', stopTour, {once:true});
+</script>
+</body>
+</html>

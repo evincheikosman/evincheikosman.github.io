@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>iWAM Admin Dashboard — Evîn Cheikosman</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Evîn<span>.</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="index.html#projects">Projects</a></li>
+    <li><a href="mailto:sokiec@gmail.com">Contact</a></li>
+  </ul>
+</nav>
+
+<main>
+  <section class="project-hero">
+    <div class="container">
+      <a href="index.html" class="back-link">← All projects</a>
+      <span class="section-label">Project 06</span>
+      <h1 class="section-title" style="margin-top: 0.5rem;">iWAM Admin Dashboard</h1>
+      <p style="color: var(--muted); margin-top: 0.25rem; font-size: 0.85rem; font-style: italic;">Compliance Analytics Module — Built into Production iWAM</p>
+      <p style="color: var(--muted); margin-top: 0.75rem; max-width: 620px; font-size: 1.05rem;">
+        A new admin analytics layer built directly into Meta's internal regulatory management system — replacing manual monthly data calculations with real-time obligation tracking, regional breakdowns, deadline risk indicators, and one-click HPM report generation.
+      </p>
+      <div class="project-meta">
+        <div class="meta-item">
+          <span class="meta-label">Type</span>
+          <span class="meta-value">New feature in production React app</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Production Diffs</span>
+          <span class="meta-value">23–32</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Access</span>
+          <span class="meta-value">Gated — admin permissions only</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Status</span>
+          <span class="meta-value">Launched &amp; live</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <div class="project-body">
+
+        <h2><span class="icon">⚠</span> The Problem</h2>
+        <p>
+          iWAM — Meta's internal system for tracking integrity obligations and requirements —
+          held all the data the program needed. Obligation counts, requirements status, regional
+          breakdowns, intake velocity, completion rates across issue areas like child and youth
+          safety, fraud and scams, harmful and illegal content, and novel technologies. It was
+          all in there. The problem was that it existed at the row level: each obligation was a
+          record, each requirement was a record, and there was no aggregate view that showed
+          how the program was actually doing.
+        </p>
+        <p>
+          Getting a useful picture required analysis, not just extraction. Every month I'd pull
+          the raw data and do the work myself: aggregate obligation counts by region and priority,
+          calculate intake velocity over the last month, half, and year, identify which risk areas
+          were accelerating or stalling, and map patterns across all of those dimensions
+          simultaneously to produce something a VP could actually act on. Were fraud and scams
+          obligations coming in faster this half than last? Was APAC intake slowing or accelerating?
+          Was child safety completion falling behind relative to intake? None of those questions
+          had pre-computed answers — I had to derive them. This took hours, and produced a static
+          snapshot that started aging the moment it was finished.
+        </p>
+        <p>
+          That monthly calculation powered the HPMs (the monthly Happenings, People &amp; Moments
+          program health reports), but it also powered everything else: ad-hoc leadership requests,
+          standing cross-functional briefings with partner teams who needed regular program status
+          updates, and any moment a VP wanted a number before a meeting. Every ask required running
+          the same analysis from scratch. I was the single point of access for data that already
+          existed in a system everyone used — which meant that every time someone needed an answer,
+          they had to wait for me.
+        </p>
+
+        <h2><span class="icon">⚙</span> What I Built</h2>
+        <p>
+          Rather than proposing a new standalone tool, I built the analytics layer directly
+          inside iWAM — organizing and surfacing data that was already in the system but had
+          no consolidated view. The dashboard is gated behind admin permissions and lives within
+          the existing production React codebase.
+        </p>
+
+        <p><strong style="color: var(--off-white);">Tier 1 — Always Visible:</strong></p>
+        <ul>
+          <li>Half-year selector for filtering all metrics by execution deadline period (H1/H2)</li>
+          <li>Auto-generated TLDR banner with live obligation and requirement counts, P0 breakdown, and deadline risk summary</li>
+          <li>"Copy as HPM Summary" button — one click formats all dashboard metrics into structured text ready for the monthly Happenings, People &amp; Moments health report (HPM), replacing hours of manual formatting</li>
+          <li>In Focus priority table: P0/P1/P2 rows showing obligation counts, completed vs. pending, with clickable deep-links to filtered detail views</li>
+          <li>Intake Volume tracking: new obligations entering the pipeline over time, by week, month, half, and year</li>
+        </ul>
+
+        <p><strong style="color: var(--off-white);">Tier 2 — Tabbed Deep-Dives:</strong></p>
+        <ul>
+          <li>Regional Breakdown: APAC, EMEA, NORAM, LATAM obligation tables with drill-down into requirements and completion status</li>
+          <li>RRC Flow: regulatory readiness completion scores by track, surfacing which areas are behind on documentation</li>
+          <li>Intake Trends: month-over-month volume charts showing obligation intake patterns by region and issue area</li>
+          <li>Deadline risk indicators: color-coded by urgency — overdue, within 14 days, within 30 days, on track</li>
+          <li>Narrative analysis paragraphs auto-generated from live data, ready to copy directly into leadership updates</li>
+        </ul>
+
+        <div class="mockup-frame">
+          <div class="mockup-chrome">
+            <div class="mockup-dots"><span></span><span></span><span></span></div>
+            <div class="mockup-url">intranet / wam / admin-dashboard</div>
+            <div class="mockup-label">Interface mockup</div>
+          </div>
+          <iframe src="mockup-compliance-dashboard.html" class="mockup-iframe" title="iWAM Admin Dashboard mockup"></iframe>
+        </div>
+        <p class="mockup-caption"><span class="mockup-live-dot"></span> Interactive demo — an animated cursor shows you around, or click the tabs yourself to explore Regional Breakdown, RRC Flow, and Intake Trends</p>
+
+        <h2><span class="icon">◎</span> Technical Details</h2>
+        <ul>
+          <li>Built within the existing production iWAM React application — no separate deployment or migration</li>
+          <li>Gated behind role-based access control for admin-only visibility</li>
+          <li>Reuses existing iWAM component library for consistency with the surrounding product</li>
+          <li>Deep-link integration routes users to filtered obligation views within the same system</li>
+          <li>Deadline risk logic: calculates days until or past execution deadline per obligation, excludes completed items from risk surface</li>
+          <li>23–32 production diffs across routing, data layer, components, access control, and iterative refinement</li>
+        </ul>
+
+        <h2><span class="icon">↑</span> Impact</h2>
+        <div class="impact-grid">
+          <div class="impact-item">
+            <span class="impact-number">Hours → seconds</span>
+            <span class="impact-label">Time to answer a leadership program health question</span>
+          </div>
+          <div class="impact-item">
+            <span class="impact-number">Real-time</span>
+            <span class="impact-label">Portfolio health visible any day, not just at monthly report time</span>
+          </div>
+          <div class="impact-item">
+            <span class="impact-number">4 regions</span>
+            <span class="impact-label">APAC, EMEA, NORAM, LATAM tracked side-by-side with drill-down</span>
+          </div>
+          <div class="impact-item">
+            <span class="impact-number">VP-level</span>
+            <span class="impact-label">Dashboard output used directly in VP meetings and program reviews</span>
+          </div>
+        </div>
+
+        <h2><span class="icon">✦</span> What I Learned</h2>
+        <p>
+          Most product instinct points toward building something new when something isn't working.
+          The more calibrated move is to figure out whether the problem is the tool itself or just
+          what it's showing you — and whether fixing that actually requires building anything new at
+          all. iWAM already had the data. It just couldn't surface it in a useful format. Building
+          an admin view inside iWAM rather than proposing a separate analytics product meant the
+          dashboard inherited the system's trust, permissions, and data connections on day one.
+          Adoption was immediate; there was no change management to run, no migration to manage,
+          no convincing people to use a new thing. Shreyas Doshi (ex-Director of Product at Stripe, ex-Group PM at Google) frames this as identifying where the actual constraint is before reaching for a solution — a lot of product decisions go wrong because the problem gets diagnosed one layer too late.
+        </p>
+        <p>
+          The other thing that only became clear after the fact: when one person is the single
+          point of access for a key data set, that can feel like competence from the inside.
+          I was fast. I was reliable. But that reliability was its own bottleneck — colleagues
+          had to wait for me, VPs had to ask, partner teams had to schedule time. When the
+          dashboard removed that dependency, the benefit wasn't just my recovered hours. It was
+          the friction that disappeared for everyone who needed the information and hadn't been
+          asking because asking cost effort. Shishir Mehrotra (co-founder and CEO of Coda, ex-VP of Product at YouTube) talks about this as reducing the "tax" on the people around a tool — the biggest tax this removed wasn't mine.
+        </p>
+        <p>
+          What surprised me most was how quickly informal use became institutional dependency.
+          The dashboard was built for my team's workflow. Within a few months it was being pulled
+          up in VP-level program reviews, referenced by partner teams in their own cross-functional
+          briefings, and depended on by colleagues when I was unavailable. I didn't design it for
+          that scale. But tools that are accurate and reliable at their core tend to attract
+          institutional weight organically — because there's always a scarcity of things people
+          can actually trust. Credibility compounds.
+        </p>
+
+        <div class="divider"></div>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+          <a href="index.html#projects" class="btn btn-primary">← All Projects</a>
+          <a href="about.html" class="btn btn-secondary">About Me</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; width: 100%;">
+    <span class="footer-name">Evîn Cheikosman</span>
+    <div class="footer-links">
+      <a href="about.html">About</a>
+      <a href="index.html#projects">Projects</a>
+      <a href="https://linkedin.com/in/evin-cheikosman" target="_blank">LinkedIn</a>
+      <a href="mailto:sokiec@gmail.com">Email</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

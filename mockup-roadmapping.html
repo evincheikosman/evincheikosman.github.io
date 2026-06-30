@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IRC People &amp; Process — H2 Roadmap</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#fff;font-size:13.5px;color:#1c1e21;display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+
+    /* ── TOP NAV ── */
+    .topnav{background:#fff;border-bottom:2px solid #1A3ECA;padding:0 24px;display:flex;align-items:center;gap:0;flex-shrink:0;}
+    .topnav-brand{font-weight:800;font-size:13.5px;color:#1A3ECA;letter-spacing:.02em;padding:12px 20px 12px 0;border-right:1px solid #e8eaed;margin-right:4px;white-space:nowrap;}
+    .topnav-item{padding:12px 13px;font-size:12.5px;color:#65676b;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;}
+    .topnav-item:hover{color:#1A3ECA;}
+    .topnav-item.active{color:#1A3ECA;font-weight:700;border-bottom-color:#1A3ECA;}
+    .topnav-sep{flex:1;}
+
+    /* ── ROADMAPPING VIEW ── */
+    .rm-wrap{flex:1;overflow-y:auto;}
+    .rm-header{background:linear-gradient(135deg,#1A3ECA 0%,#3b5fe4 100%);color:#fff;padding:22px 40px 18px;}
+    .rm-badge-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+    .rm-half-badge{background:rgba(255,255,255,.22);color:#fff;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.06em;}
+    .rm-complete-badge{background:#22c55e;color:#fff;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px;}
+    .rm-title{font-size:21px;font-weight:800;letter-spacing:-.03em;margin-bottom:5px;}
+    .rm-sub{font-size:12px;opacity:.82;line-height:1.5;}
+    .rm-body{padding:20px 40px 60px;}
+    .rm-intro-text{font-size:12.5px;line-height:1.7;color:#3c4043;margin-bottom:16px;}
+    .callout-box{background:#eef2ff;border:1px solid #c7d2fe;border-radius:8px;padding:13px 15px;margin-bottom:18px;}
+    .callout-label{font-size:11px;font-weight:700;color:#1A3ECA;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;}
+    .callout-text{font-size:12px;color:#3730a3;line-height:1.6;}
+    .rm-stats-bar{display:flex;margin-bottom:20px;background:#f8f9fb;border:1px solid #e8eaed;border-radius:8px;overflow:hidden;}
+    .rm-stat{flex:1;padding:11px 14px;border-right:1px solid #e8eaed;text-align:center;}
+    .rm-stat:last-child{border-right:none;}
+    .rm-stat-num{display:block;font-size:17px;font-weight:800;color:#1A3ECA;letter-spacing:-.02em;}
+    .rm-stat-label{display:block;font-size:10.5px;color:#65676b;margin-top:2px;}
+    .rm-legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;font-size:10.5px;color:#65676b;align-items:center;}
+    .rm-filter-bar{display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap;}
+    .rm-filter{padding:5px 13px;border-radius:20px;font-size:11.5px;font-weight:600;border:1px solid #e8eaed;cursor:pointer;color:#65676b;background:#fff;transition:all .15s;}
+    .rm-filter:hover{border-color:#a5b4fc;color:#1A3ECA;}
+    .rm-filter.active{background:#1A3ECA;color:#fff;border-color:#1A3ECA;}
+    .rm-obl{background:#fff;border:1px solid #e8eaed;border-radius:8px;padding:12px 14px;margin-bottom:9px;transition:box-shadow .15s;}
+    .rm-obl:hover{box-shadow:0 2px 10px rgba(26,62,202,.1);}
+    .rm-obl.hidden{display:none;}
+    .rm-obl-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:6px;}
+    .rm-obl-name{font-size:12.5px;font-weight:700;color:#1c1e21;line-height:1.4;}
+    .rm-obl-desc{font-size:11.5px;color:#65676b;line-height:1.5;margin-bottom:9px;}
+    .rm-obl-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+    .rm-region-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;letter-spacing:.04em;white-space:nowrap;}
+    .rm-region-badge.APAC{background:#dce8ff;color:#1A3ECA;}
+    .rm-region-badge.EMEA{background:#ede9fe;color:#6d28d9;}
+    .rm-region-badge.LATAM{background:#dcfce7;color:#15803d;}
+    .rm-region-badge.NORAM{background:#fef3c7;color:#b45309;}
+    .rm-track-badges{display:flex;gap:4px;flex-wrap:wrap;}
+    .rm-track-badge{font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;}
+    .rm-track-badge.RR{background:#dce8ff;color:#1A3ECA;}
+    .rm-track-badge.CS{background:#ede9fe;color:#6d28d9;}
+    .rm-track-badge.HC{background:#fee2e2;color:#b91c1c;}
+    .rm-track-badge.AI{background:#d1fae5;color:#065f46;}
+    .rm-track-badge.FS{background:#fef3c7;color:#b45309;}
+    .rm-track-badge.DC{background:#e0f2fe;color:#0369a1;}
+    .rm-track-badge.RC{background:#f1f5f9;color:#475569;}
+    .rm-products{font-size:11px;color:#65676b;}
+    .rm-products strong{color:#1c1e21;font-weight:600;}
+    .rm-deadline{font-size:11px;font-weight:700;white-space:nowrap;padding:3px 8px;border-radius:4px;}
+    .rm-deadline.red{background:#fee2e2;color:#b91c1c;}
+    .rm-deadline.amber{background:#fef3c7;color:#b45309;}
+    .rm-deadline.green{background:#dcfce7;color:#15803d;}
+    .rm-section-title{font-size:11px;font-weight:700;color:#65676b;text-transform:uppercase;letter-spacing:.08em;margin:20px 0 9px;}
+    .rm-track-table{width:100%;border-collapse:collapse;font-size:11.5px;}
+    .rm-track-table th{background:#f8f9fb;padding:7px 11px;text-align:left;font-weight:700;border-bottom:2px solid #e8eaed;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#65676b;}
+    .rm-track-table td{padding:8px 11px;border-bottom:1px solid #f0f2f5;vertical-align:middle;}
+    .rm-track-table tr:last-child td{border-bottom:none;}
+    .rm-track-count{display:inline-block;background:#1A3ECA;color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;margin-right:6px;}
+    .rm-legend-item{display:flex;align-items:center;gap:4px;}
+
+    /* ── TOUR CURSOR ── */
+    #tc{position:fixed;width:22px;height:22px;border-radius:50%;background:rgba(26,62,202,.18);border:2px solid #1A3ECA;transform:translate(-50%,-50%);pointer-events:none;z-index:9999;opacity:0;transition:left .55s cubic-bezier(.4,0,.2,1),top .55s cubic-bezier(.4,0,.2,1),opacity .3s;}
+    #tc.ck{background:rgba(26,62,202,.38);transform:translate(-50%,-50%) scale(.65);transition:transform .15s,background .15s;}
+    .tcr{position:absolute;inset:-7px;border-radius:50%;border:1.5px solid rgba(26,62,202,.3);animation:tr 1.4s ease infinite;}
+    @keyframes tr{0%{transform:scale(.7);opacity:.9}100%{transform:scale(1.9);opacity:0}}
+    @keyframes dp{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:.15;transform:scale(.65)}}
+    .nav-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:#1A3ECA;margin-left:5px;vertical-align:middle;opacity:.6;animation:dp 2.5s ease infinite;}
+  </style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <div class="topnav-brand">INTEGRITY RISK &amp; COMPLIANCE</div>
+  <div class="topnav-item">Home</div>
+  <div class="topnav-item">Roles</div>
+  <div class="topnav-item">Obligations</div>
+  <div class="topnav-item">Escalation</div>
+  <div class="topnav-item">People</div>
+  <div class="topnav-item">Track Owner</div>
+  <div class="topnav-item">Surface Owner</div>
+  <div class="topnav-item">Glossary</div>
+  <div class="topnav-sep"></div>
+  <div class="topnav-item active">H2 Roadmap <span class="nav-dot"></span></div>
+</nav>
+
+<!-- ROADMAPPING VIEW -->
+<div class="rm-wrap">
+  <div class="rm-header">
+    <div class="rm-badge-row">
+      <span class="rm-half-badge">H2 2026</span>
+      <span class="rm-complete-badge">✓ Roadmapping Complete</span>
+    </div>
+    <div class="rm-title">H2 2026 Integrity Obligation Roadmap</div>
+    <div class="rm-sub">Planned in partnership with Integrity Legal, Product, Ops &amp; Policy · 9 obligations · 4 regions · 7 tracks impacted</div>
+  </div>
+
+  <div class="rm-body">
+    <p class="rm-intro-text">
+      Roadmapping for H2 2026 is complete. The obligations below represent the new regulatory
+      requirements entering the IRC pipeline this half — mapped to the compliance tracks and
+      product surfaces responsible for delivery.
+    </p>
+
+    <div class="callout-box">
+      <div class="callout-label">⚠ Off-Cycle Obligations</div>
+      <div class="callout-text">New obligations will emerge off-cycle via enforcement actions, legislative amendments,
+      or emerging regulatory priorities. This roadmap will be updated as they come in and resources
+      readjusted accordingly. This is our best proactive view at the start of the half — not a
+      closed list.</div>
+    </div>
+
+    <div class="rm-stats-bar">
+      <div class="rm-stat"><span class="rm-stat-num">9</span><span class="rm-stat-label">New obligations</span></div>
+      <div class="rm-stat"><span class="rm-stat-num">4</span><span class="rm-stat-label">Regions</span></div>
+      <div class="rm-stat"><span class="rm-stat-num">7</span><span class="rm-stat-label">Tracks impacted</span></div>
+      <div class="rm-stat"><span class="rm-stat-num">12+</span><span class="rm-stat-label">Product surfaces</span></div>
+      <div class="rm-stat"><span class="rm-stat-num">Sep–Dec</span><span class="rm-stat-label">Deadline window</span></div>
+    </div>
+
+    <div class="rm-legend">
+      <strong style="color:#1c1e21;margin-right:4px;">Track codes:</strong>
+      <span class="rm-legend-item"><span class="rm-track-badge RR">RR</span> Regulatory Response</span>
+      <span class="rm-legend-item"><span class="rm-track-badge HC">HC</span> Harmful Content</span>
+      <span class="rm-legend-item"><span class="rm-track-badge CS">CS</span> Child Safety</span>
+      <span class="rm-legend-item"><span class="rm-track-badge AI">AI</span> AI Governance</span>
+      <span class="rm-legend-item"><span class="rm-track-badge DC">DC</span> Data Compliance</span>
+      <span class="rm-legend-item"><span class="rm-track-badge RC">RC</span> Regional Compliance</span>
+      <span class="rm-legend-item"><span class="rm-track-badge FS">FS</span> Fraud &amp; Scams</span>
+    </div>
+
+    <div class="rm-filter-bar">
+      <div class="rm-filter active" data-filter="all">All Regions (9)</div>
+      <div class="rm-filter" data-filter="APAC">🌏 APAC (2)</div>
+      <div class="rm-filter" data-filter="EMEA">🌍 EMEA (3)</div>
+      <div class="rm-filter" data-filter="LATAM">🌎 LATAM (2)</div>
+      <div class="rm-filter" data-filter="NORAM">NORAM (2)</div>
+    </div>
+
+    <div id="rm-obligations">
+
+      <div class="rm-obl" data-region="APAC">
+        <div class="rm-obl-top">
+          <div><div class="rm-obl-name">Australia OSA — AI-Generated Content Standards</div></div>
+          <div class="rm-deadline red">Oct 15, 2026</div>
+        </div>
+        <div class="rm-obl-desc">New provisions under the Online Safety Act requiring detection, labeling, and removal of AI-generated content meeting harmful content thresholds. Includes mandatory reporting to the eSafety Commissioner.</div>
+        <div class="rm-obl-meta">
+          <span class="rm-region-badge APAC">APAC</span>
+          <div class="rm-track-badges"><span class="rm-track-badge HC">HC</span><span class="rm-track-badge AI">AI</span></div>
+          <div class="rm-products"><strong>Products:</strong> Feed · Instagram · Reels</div>
+        </div>
+      </div>
+
+      <div class="rm-obl" data-region="APAC">
+        <div class="rm-obl-top">
+          <div><div class="rm-obl-name">Singapore DSA — Child Protection Amendment</div></div>
+          <div class="rm-deadline amber">Sep 30, 2026</div>
+        </div>
+        <div class="rm-obl-desc">Updated child safety provisions under the Digital Safety Act requiring enhanced age verification and parental supervision tooling across messaging and social surfaces.</div>
+        <div class="rm-obl-meta">
+          <span class="rm-region-badge APAC">APAC</span>
+          <div class="rm-track-badges"><span class="rm-track-badge CS">CS</span><span class="rm-track-badge RC">RC</span></div>
+          <div class="rm-products"><strong>Products:</strong> Instagram · Messenger · WhatsApp</div>
+        </div>
+      </div>
+
+      <div class="rm-obl" data-region="EMEA">
+        <div class="rm-obl-top">
+          <div><div class="rm-obl-name">EU DSA — H2 Systemic Risk Assessment</div></div>
+          <div class="rm-deadline red">Nov 1, 2026</div>
+        </div>
+        <div class="rm-obl-desc">Biannual systemic risk assessment submission covering societal, fundamental rights, and public security risks. Requires methodology documentation, mitigation measures, and external auditor sign-off.</div>
+        <div class="rm-obl-meta">
+          <span class="rm-region-badge EMEA">EMEA</span>
+          <div class="rm-track-badges"><span class="rm-track-badge RR">RR</span><span class="rm-track-badge HC">HC</span></div>
+          <div class="rm-products"><strong>Products:</strong> All surfaces</div>
+        </div>
+      </div>
+
+      <div class="rm-obl" data-region="EMEA">
+        <div class="rm-obl-top">
+          <div><div class="rm-obl-name">EU AI Act — Algorithmic Content Ranking Classification</div></div>
+          <div class="rm-deadline red">Oct 31, 2026</div>
+        </div>
+        <div class="rm-obl-desc">Classification and technical documentation requirements for algorithmic content ranking systems under the EU AI Act high-risk system framework. Includes conformity assessment filing and human oversight documentation.</div>
+        <div class="rm-obl-meta">
+          <span class="rm-region-badge EMEA">EMEA</span>
+          <div class="rm-track-badges"><span class="rm-track-badge AI">AI</span><span class="rm-track-badge RR">RR</span></div>
+          <div class="rm-products"><strong>Products:</strong> Feed · Ads</div>
+        </div>
+      </div>
+
+      <div class="rm-obl" data-region="EMEA">
+        <div class="rm-obl-top">
+          <div><div class="rm-obl-name">Germany NetzDG — Quarterly Reporting Format Update</div></div>
+          <div class="rm-deadline green">Sep 15, 2026</div>
+        </div>
+        <div class="rm-obl-desc">Updated regulatory reporting format requirements for NetzDG transparency reports, including new categorization schema for content removal decisions and updated submission cadence.</div>
+        <div class="rm-obl-meta">
+          <span class="rm-region-badge EMEA">EMEA</span>
+          <div class="rm-track-badges"><span class="rm-track-badge RR">RR</span><span class="rm-track-badge DC">DC</span></div>
+          <div class="rm-products"><strong>Products:</strong> Facebook · Instagram</div>
+        </div>
+      </div>
+
+      <div class="rm-obl" data-region="LATAM">
+        <div class="rm-obl-top">
+          <div><div class="rm-obl-name">Brazil PL 2630 — Content Transparency Implementation</div></div>
+          <div class="rm-deadline red">Dec 1, 2026</div>
+        </div>
+        <div class="rm-obl-desc">Content labeling, moderation transparency, and recommender system disclosure requirements under Brazil's digital platform accountability framework. Includes monthly reporting obligations to ANATEL.</div>
+        <div class="rm-obl-meta">
+          <span class="rm-region-badge LATAM">LATAM</span>
+          <div class="rm-track-badges"><span class="rm-track-badge HC">HC</span><span class="rm-track-badge FS">FS</span></div>
+          <div class="rm-products"><strong>Products:</strong> Feed · Groups · WhatsApp</div>
+        </div>
+      </div>
+
+      <div class="rm-obl" data-region="LATAM">
+        <div class="rm-obl-top">
+          <div><div class="rm-obl-name">Mexico Platform Safety — Content Appeals Mechanism</div></div>
+          <div class="rm-deadline red">Nov 15, 2026</div>
+        </div>
+        <div class="rm-obl-desc">New requirement for a user-accessible content appeals mechanism meeting Mexican regulatory specifications, including turnaround SLAs and mandatory outcome reporting to the regulatory body.</div>
+        <div class="rm-obl-meta">
+          <span class="rm-region-badge LATAM">LATAM</span>
+          <div class="rm-track-badges"><span class="rm-track-badge RR">RR</span><span class="rm-track-badge RC">RC</span></div>
+          <div class="rm-products"><strong>Products:</strong> Feed · Instagram</div>
+        </div>
+      </div>
+
+      <div class="rm-obl" data-region="NORAM">
+        <div class="rm-obl-top">
+          <div><div class="rm-obl-name">US KOSA — Kids Online Safety Act Implementation</div></div>
+          <div class="rm-deadline red">Oct 1, 2026</div>
+        </div>
+        <div class="rm-obl-desc">Child safety requirements including default-safe settings for minors, content warning systems, parental supervision tools, and data minimization mandates for users under 17. FTC enforcement window opens Q4.</div>
+        <div class="rm-obl-meta">
+          <span class="rm-region-badge NORAM">NORAM</span>
+          <div class="rm-track-badges"><span class="rm-track-badge CS">CS</span><span class="rm-track-badge RR">RR</span></div>
+          <div class="rm-products"><strong>Products:</strong> Instagram · Messenger · WhatsApp</div>
+        </div>
+      </div>
+
+      <div class="rm-obl" data-region="NORAM">
+        <div class="rm-obl-top">
+          <div><div class="rm-obl-name">Canada Online Harms Act — Operator Registration &amp; Certification</div></div>
+          <div class="rm-deadline green">Sep 1, 2026</div>
+        </div>
+        <div class="rm-obl-desc">Initial operator registration, compliance plan submission, and designated contact appointment under Canada's Online Harms Act regulatory framework. Earliest deadline of the half — registration window closes Sep 1.</div>
+        <div class="rm-obl-meta">
+          <span class="rm-region-badge NORAM">NORAM</span>
+          <div class="rm-track-badges"><span class="rm-track-badge RR">RR</span><span class="rm-track-badge HC">HC</span><span class="rm-track-badge DC">DC</span></div>
+          <div class="rm-products"><strong>Products:</strong> All surfaces</div>
+        </div>
+      </div>
+
+    </div><!-- /rm-obligations -->
+
+    <div class="rm-section-title">Impact by Compliance Track</div>
+    <table class="rm-track-table">
+      <thead>
+        <tr>
+          <th>Track</th>
+          <th>New Obligations</th>
+          <th>Regions Impacted</th>
+          <th>Highest-Priority Deadline</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="rm-track-badge RR" style="font-size:11px;">RR</span> Regulatory Response</td>
+          <td><span class="rm-track-count">6</span></td>
+          <td>EMEA · LATAM · NORAM</td>
+          <td style="font-weight:700;color:#b91c1c;">Sep 1, 2026</td>
+        </tr>
+        <tr>
+          <td><span class="rm-track-badge HC" style="font-size:11px;">HC</span> Harmful Content Enforcement</td>
+          <td><span class="rm-track-count">4</span></td>
+          <td>APAC · EMEA · LATAM · NORAM</td>
+          <td style="font-weight:700;color:#b45309;">Oct 15, 2026</td>
+        </tr>
+        <tr>
+          <td><span class="rm-track-badge CS" style="font-size:11px;">CS</span> Child Safety Standards</td>
+          <td><span class="rm-track-count">2</span></td>
+          <td>APAC · NORAM</td>
+          <td style="font-weight:700;color:#b45309;">Sep 30, 2026</td>
+        </tr>
+        <tr>
+          <td><span class="rm-track-badge AI" style="font-size:11px;">AI</span> AI Governance</td>
+          <td><span class="rm-track-count">2</span></td>
+          <td>APAC · EMEA</td>
+          <td style="font-weight:700;color:#b91c1c;">Oct 15, 2026</td>
+        </tr>
+        <tr>
+          <td><span class="rm-track-badge DC" style="font-size:11px;">DC</span> Data Compliance</td>
+          <td><span class="rm-track-count">2</span></td>
+          <td>EMEA · NORAM</td>
+          <td style="font-weight:700;color:#15803d;">Sep 1, 2026</td>
+        </tr>
+        <tr>
+          <td><span class="rm-track-badge RC" style="font-size:11px;">RC</span> Regional Compliance</td>
+          <td><span class="rm-track-count">2</span></td>
+          <td>APAC · LATAM</td>
+          <td style="font-weight:700;color:#b45309;">Sep 30, 2026</td>
+        </tr>
+        <tr>
+          <td><span class="rm-track-badge FS" style="font-size:11px;">FS</span> Fraud &amp; Scams</td>
+          <td><span class="rm-track-count">1</span></td>
+          <td>LATAM</td>
+          <td style="font-weight:700;color:#b91c1c;">Dec 1, 2026</td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+</div>
+
+<!-- Disclaimer -->
+<div style="position:fixed;bottom:0;left:0;right:0;padding:5px 14px;background:rgba(248,247,245,0.96);border-top:1px solid #e8eaed;font-size:10px;color:#8a8d91;z-index:500;text-align:center;letter-spacing:.01em;">
+  Illustrative mockup — all names, data, and content are entirely fictional. No proprietary or confidential information is depicted.
+</div>
+
+<!-- Tour cursor -->
+<div id="tc"><div class="tcr"></div></div>
+
+<script>
+  // ── REGION FILTER ──
+  function setFilter(filterVal) {
+    document.querySelectorAll('.rm-filter').forEach(b => b.classList.remove('active'));
+    const btn = document.querySelector(`.rm-filter[data-filter="${filterVal}"]`);
+    if (btn) btn.classList.add('active');
+    document.querySelectorAll('.rm-obl').forEach(obl => {
+      if (filterVal === 'all' || obl.dataset.region === filterVal) {
+        obl.classList.remove('hidden');
+      } else {
+        obl.classList.add('hidden');
+      }
+    });
+  }
+
+  document.querySelectorAll('.rm-filter').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setFilter(btn.dataset.filter);
+    });
+  });
+
+  // ── ANIMATED TOUR ──
+  // Sequence: click EMEA → click NORAM → click APAC → click All
+  const filterSeq = ['EMEA', 'NORAM', 'APAC', 'all'];
+  let idx = 0, alive = true, t;
+  const cur = document.getElementById('tc');
+
+  function clickFilter(filterVal, then) {
+    const btn = document.querySelector(`.rm-filter[data-filter="${filterVal}"]`);
+    if (!btn || !alive) return;
+    const r = btn.getBoundingClientRect();
+    cur.style.left = (r.left + r.width / 2) + 'px';
+    cur.style.top  = (r.top  + r.height / 2) + 'px';
+    cur.style.opacity = '1';
+    setTimeout(() => {
+      if (!alive) return;
+      cur.classList.add('ck');
+      setTimeout(() => {
+        if (!alive) return;
+        cur.classList.remove('ck');
+        setFilter(filterVal);
+        t = setTimeout(then, 2600);
+      }, 220);
+    }, 700);
+  }
+
+  function step0() { clickFilter('EMEA', step1); }
+  function step1() { clickFilter('NORAM', step2); }
+  function step2() { clickFilter('APAC', step3); }
+  function step3() { clickFilter('all', () => { t = setTimeout(step0, 3200); }); }
+
+  const ts = setTimeout(step0, 1800);
+  function stopTour() { alive=false; clearTimeout(t); clearTimeout(ts); cur.style.opacity='0'; }
+  document.addEventListener('click', stopTour, {once:true});
+</script>
+</body>
+</html>

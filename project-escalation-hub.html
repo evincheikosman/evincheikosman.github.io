@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IRC Escalation Hub — Evîn Cheikosman</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Evîn<span>.</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="index.html#projects">Projects</a></li>
+    <li><a href="mailto:sokiec@gmail.com">Contact</a></li>
+  </ul>
+</nav>
+
+<main>
+  <section class="project-hero">
+    <div class="container">
+      <a href="index.html" class="back-link">← All projects</a>
+      <span class="section-label">Project 01</span>
+      <h1 class="section-title" style="margin-top: 0.5rem;">IRC Escalation Hub</h1>
+      <p style="color: var(--muted); margin-top: 0.25rem; font-size: 0.85rem; font-style: italic;">Integrity, Risk &amp; Compliance Escalation Hub</p>
+      <p style="color: var(--muted); margin-top: 0.75rem; max-width: 620px; font-size: 1.05rem;">
+        A unified platform replacing 4 disconnected tools—handling the complete lifecycle of high-stakes compliance decisions, from submission to searchable archive, across a 1,000+ person organization.
+      </p>
+      <div class="project-meta">
+        <div class="meta-item">
+          <span class="meta-label">Timeline</span>
+          <span class="meta-value">~12 weeks</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Production Diffs</span>
+          <span class="meta-value">100+</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Rollout</span>
+          <span class="meta-value">1,000+ person org in under 3 weeks</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Status</span>
+          <span class="meta-value">Launched &amp; live</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <div class="project-body">
+
+        <h2><span class="icon">⚠</span> The Problem</h2>
+        <p>
+          IRC's escalation process handled the organization's highest-stakes regulatory compliance decisions — the ones too complex or consequential for any single team to own, requiring cross-functional input from engineering, ops, policy, legal, and product to reach consensus. I owned the entire lifecycle: intake, facilitation, stakeholder coordination, decision documentation, and tracking outcomes through to resolution.
+        </p>
+        <p>
+          Every step of that process was manual and fragmented. Requests came in through forms, status lived in spreadsheets, context was scattered across threads, and past decisions were buried in documents nobody could find. There was no searchable archive, no audit trail, no visibility into what was in-flight — and no institutional memory to build on. Every escalation started from zero.
+        </p>
+
+        <h2><span class="icon">⚙</span> What I Built</h2>
+        <p>
+          A unified escalation management platform handling the complete lifecycle from submission to
+          decision archival. I designed the system architecture, taught myself to code, and shipped it
+          entirely without engineering support.
+        </p>
+        <ul>
+          <li>Searchable decision archive — 90+ historical decisions indexed and queryable</li>
+          <li>AI-powered assistant for querying past decisions and process guidance</li>
+          <li>Structured submission and admin review queue with approval workflow</li>
+          <li>7-section analytics dashboard with deep-links to underlying data</li>
+          <li>Automated presentation deck generation with completion detection</li>
+          <li>Auto-created Google Chat spaces on approval — 11 stakeholders added automatically</li>
+          <li>Scheduled reminders for upcoming meetings via calendar integration</li>
+          <li>Dynamic announcements and alerts widget</li>
+          <li>Collaborative discussion threads tied to each decision record</li>
+          <li>Integrated feature request and bug reporting portal — all submissions triaged, prioritized, and resolved independently; 95–98% of requests shipped within days of submission</li>
+        </ul>
+
+        <div class="mockup-frame">
+          <div class="mockup-chrome">
+            <div class="mockup-dots"><span></span><span></span><span></span></div>
+            <div class="mockup-url">intranet / irc-escalation-hub</div>
+            <div class="mockup-label">Interface mockup</div>
+          </div>
+          <iframe src="mockup-escalation-hub.html" class="mockup-iframe" title="IRC Escalation Hub interface mockup"></iframe>
+        </div>
+        <p class="mockup-caption"><span class="mockup-live-dot"></span> Interactive demo — an animated cursor shows you around, or click the sidebar yourself to switch views</p>
+
+        <h2><span class="icon">◎</span> Technical Integrations</h2>
+        <ul>
+          <li>Google Slides API — programmatic deck generation with slide completion detection; decks auto-populate on escalation approval</li>
+          <li>Google Chat API — automated space provisioning and member management triggered by approval workflow events</li>
+          <li>Google Calendar API — event creation and scheduling wired directly into the submission and approval flow</li>
+          <li>Chronos (scheduled job orchestration) — time-based reminder triggers for upcoming escalation meetings</li>
+          <li>LLM / AI integration — natural language Q&amp;A layer over 90+ indexed decisions; surfaces relevant precedent without manual search</li>
+          <li>Internal regulatory data API — deep-linked data pulls into the analytics dashboard</li>
+          <li>Claude Code — used throughout development for code generation, debugging, and iterative feature work</li>
+        </ul>
+
+        <h2><span class="icon">↑</span> Impact</h2>
+        <div class="impact-grid">
+          <div class="impact-item">
+            <span class="impact-number">100+</span>
+            <span class="impact-label">Production diffs shipped</span>
+          </div>
+          <div class="impact-item">
+            <span class="impact-number">&lt;3 weeks</span>
+            <span class="impact-label">Full org rollout to 1,000+ person org</span>
+          </div>
+          <div class="impact-item">
+            <span class="impact-number">4 → 1</span>
+            <span class="impact-label">Disconnected systems replaced</span>
+          </div>
+          <div class="impact-item">
+            <span class="impact-number">90+</span>
+            <span class="impact-label">Historical decisions now searchable</span>
+          </div>
+          <div class="impact-item">
+            <span class="impact-number">Cross-program</span>
+            <span class="impact-label">Other Meta teams adopted the codebase for their own escalation protocols</span>
+          </div>
+        </div>
+
+        <div class="callout">
+          "Probably my favorite example of someone embracing the right mindset to quickly become super technical."
+          <br><br>— Engineering Partner
+        </div>
+
+        <h2><span class="icon">✦</span> What I Learned</h2>
+        <p>
+          This was the first production tool I'd ever shipped — built on the job, learning to code
+          while managing the program simultaneously. The user base set the bar: VPs, Directors, and
+          senior cross-functional leaders making high-stakes regulatory decisions. That pressure was
+          clarifying. Every confusing UI element costs credibility with that audience. I learned what
+          "production-quality" actually means from people who wouldn't accept anything less.
+        </p>
+        <p>
+          The real challenge wasn't technical — it was adoption. Replacing something people had relied
+          on for years meant bridging the gap between the old mental model and the new one. I ran
+          office hours, did 1:1 walkthroughs, fixed anything confusing the same day it was flagged.
+          What I didn't expect was how fast it clicked: within the first month, people weren't just
+          using it — they were bringing others along. VPs were turning around decisions faster.
+          Escalation velocity went up. The tool sold itself once people touched it; my job was making
+          sure they actually touched it.
+        </p>
+        <p>
+          The outcome I hadn't planned for: other Meta programs started reaching out, wanting to build
+          something similar for their own escalation protocols. Because the codebase was already solid,
+          they could build on top of it rather than starting from scratch. The tool scaled into programs
+          I never designed it for — not because I promoted it, but because it was good enough that
+          other people wanted it.
+        </p>
+
+        <div class="divider"></div>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+          <a href="project-regulatory-triage.html" class="btn btn-primary">Next Project →</a>
+          <a href="index.html#projects" class="btn btn-secondary">All Projects</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; width: 100%;">
+    <span class="footer-name">Evîn Cheikosman</span>
+    <div class="footer-links">
+      <a href="about.html">About</a>
+      <a href="index.html#projects">Projects</a>
+      <a href="https://linkedin.com/in/evin-cheikosman" target="_blank">LinkedIn</a>
+      <a href="mailto:sokiec@gmail.com">Email</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

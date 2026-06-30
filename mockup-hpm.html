@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IRC Program Team — Workplace</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f0f2f5;font-size:14px;color:#1c1e21;display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+
+    /* ── TOP BAR ── */
+    .wp-header{height:48px;background:#003594;display:flex;align-items:center;padding:0 14px;gap:10px;flex-shrink:0;z-index:100;}
+    .wp-logo{color:#fff;font-weight:800;font-size:14px;letter-spacing:-.02em;display:flex;align-items:center;gap:7px;}
+    .wp-logo-icon{width:24px;height:24px;background:#fff;border-radius:4px;display:flex;align-items:center;justify-content:center;}
+    .wp-logo-icon svg{width:16px;height:16px;}
+    .wp-search{flex:1;max-width:260px;margin-left:10px;}
+    .wp-search input{width:100%;background:rgba(255,255,255,.18);border:none;border-radius:20px;padding:6px 14px;font-size:12.5px;color:#fff;font-family:inherit;outline:none;}
+    .wp-search input::placeholder{color:rgba(255,255,255,.7);}
+    .wp-header-icons{margin-left:auto;display:flex;align-items:center;gap:4px;}
+    .wp-icon-btn{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;cursor:pointer;}
+    .wp-icon-btn:hover{background:rgba(255,255,255,.25);}
+    .wp-avatar{width:30px;height:30px;border-radius:50%;background:#e85d04;color:#fff;font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+
+    /* ── LAYOUT ── */
+    .wp-body{flex:1;display:flex;overflow:hidden;}
+
+    /* ── SIDEBAR ── */
+    .wp-sidebar{width:220px;background:#fff;border-right:1px solid #e0e2e6;overflow-y:auto;flex-shrink:0;padding:10px 0;}
+    .sidebar-section{padding:4px 8px;}
+    .sidebar-label{font-size:11px;font-weight:700;color:#8a8d91;text-transform:uppercase;letter-spacing:.08em;padding:6px 8px 4px;}
+    .sidebar-item{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:6px;cursor:pointer;font-size:13px;color:#1c1e21;}
+    .sidebar-item:hover{background:#f0f2f5;}
+    .sidebar-item.active{background:#e8eef9;color:#003594;font-weight:600;}
+    .sidebar-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0;}
+    .sidebar-divider{border-bottom:1px solid #e0e2e6;margin:6px 12px;}
+    .group-avatar{width:20px;height:20px;border-radius:4px;background:#003594;color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+    /* ── MAIN ── */
+    .wp-main{flex:1;overflow-y:auto;padding:16px;}
+    .wp-feed{max-width:620px;margin:0 auto;}
+
+    /* ── GROUP HEADER ── */
+    .group-cover{background:linear-gradient(135deg,#003594,#0055b3);border-radius:10px 10px 0 0;height:80px;display:flex;align-items:flex-end;padding:12px 16px;margin-bottom:0;}
+    .group-cover-title{color:#fff;font-size:16px;font-weight:800;letter-spacing:-.01em;}
+    .group-cover-sub{color:rgba(255,255,255,.75);font-size:11.5px;margin-top:2px;}
+    .group-meta-bar{background:#fff;border-radius:0 0 10px 10px;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;border:1px solid #e0e2e6;border-top:none;}
+    .group-meta-text{font-size:12px;color:#65676b;}
+    .group-meta-text strong{color:#1c1e21;}
+    .btn-join{background:#e8eef9;color:#003594;border:none;border-radius:6px;padding:6px 14px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;}
+
+    /* ── POST CARD ── */
+    .post-card{background:#fff;border-radius:10px;border:1px solid #e0e2e6;margin-bottom:14px;overflow:hidden;}
+    .post-header{padding:12px 14px 8px;display:flex;align-items:flex-start;gap:10px;}
+    .post-avatar{width:38px;height:38px;border-radius:50%;background:#1A3ECA;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .post-meta{flex:1;}
+    .post-author{font-size:13.5px;font-weight:700;color:#1c1e21;margin-bottom:1px;}
+    .post-group{font-size:12px;color:#65676b;}
+    .post-group a{color:#003594;font-weight:600;}
+    .post-time{font-size:11.5px;color:#8a8d91;margin-top:1px;}
+    .post-pin{background:#fff3cd;color:#b07800;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:6px;}
+
+    /* ── POST BODY ── */
+    .post-body{padding:0 14px 10px;font-size:13.5px;line-height:1.65;color:#1c1e21;white-space:pre-wrap;}
+    .post-body-collapsed{max-height:200px;overflow:hidden;position:relative;}
+    .post-body-collapsed::after{content:'';position:absolute;bottom:0;left:0;right:0;height:40px;background:linear-gradient(transparent,#fff);}
+    .post-mention{color:#003594;font-weight:600;}
+    .post-grade{font-family:'SF Mono','Monaco','Consolas',monospace;font-size:12px;}
+    .see-more-btn{display:inline;background:none;border:none;color:#65676b;font-weight:700;font-size:13px;cursor:pointer;padding:0;font-family:inherit;}
+    .see-more-btn:hover{text-decoration:underline;}
+
+    .post-body-extra{display:none;}
+    .post-body-extra.open{display:block;}
+
+    .section-head{font-weight:800;color:#1c1e21;margin-top:12px;margin-bottom:4px;}
+    .divider-line{color:#8a8d91;margin:10px 0 4px;}
+
+    /* ── REACTIONS BAR ── */
+    .post-reactions-summary{padding:6px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e0e2e6;font-size:12.5px;color:#65676b;}
+    .rxn-emojis{display:flex;gap:2px;align-items:center;}
+    .rxn-emoji{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;border:1.5px solid #fff;}
+    .rxn-count{margin-left:5px;}
+
+    .post-actions{padding:4px 14px;display:flex;gap:2px;border-bottom:1px solid #e0e2e6;}
+    .action-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;color:#65676b;border:none;background:none;font-family:inherit;}
+    .action-btn:hover{background:#f0f2f5;}
+    .action-btn.reacted{color:#003594;}
+    .action-icon{font-size:16px;}
+
+    /* ── COMMENTS ── */
+    .post-comments{padding:10px 14px 12px;}
+    .comment{display:flex;gap:8px;margin-bottom:10px;}
+    .comment-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:10px;color:#fff;flex-shrink:0;}
+    .comment-bubble{background:#f0f2f5;border-radius:14px;padding:8px 12px;flex:1;}
+    .comment-name{font-size:12.5px;font-weight:700;margin-bottom:2px;}
+    .comment-text{font-size:12.5px;line-height:1.5;color:#1c1e21;}
+    .comment-actions{display:flex;gap:12px;margin-top:4px;padding-left:4px;}
+    .comment-action{font-size:11.5px;color:#65676b;cursor:pointer;font-weight:600;}
+    .comment-action:hover{text-decoration:underline;}
+    .comment-time{font-size:11px;color:#8a8d91;}
+
+    .add-comment{display:flex;gap:8px;align-items:center;padding-top:4px;}
+    .add-comment-avatar{width:28px;height:28px;border-radius:50%;background:#1A3ECA;color:#fff;font-weight:700;font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .add-comment-input{flex:1;background:#f0f2f5;border:none;border-radius:20px;padding:7px 14px;font-size:12.5px;font-family:inherit;outline:none;color:#1c1e21;}
+
+    /* ── TOUR CURSOR ── */
+    #tc{position:fixed;width:20px;height:20px;border-radius:50%;background:rgba(0,53,148,.18);border:2px solid #003594;transform:translate(-50%,-50%);pointer-events:none;z-index:9999;opacity:0;transition:left .55s cubic-bezier(.4,0,.2,1),top .55s cubic-bezier(.4,0,.2,1),opacity .3s;}
+    #tc.ck{background:rgba(0,53,148,.38);transform:translate(-50%,-50%) scale(.65);transition:transform .15s,background .15s;}
+    .tcr{position:absolute;inset:-7px;border-radius:50%;border:1.5px solid rgba(0,53,148,.3);animation:tr 1.4s ease infinite;}
+    @keyframes tr{0%{transform:scale(.7);opacity:.9}100%{transform:scale(1.9);opacity:0}}
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="wp-header">
+  <div class="wp-logo">
+    <div class="wp-logo-icon">
+      <svg viewBox="0 0 24 24" fill="#003594"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+    </div>
+    Workplace
+  </div>
+  <div class="wp-search"><input placeholder="Search Workplace" /></div>
+  <div class="wp-header-icons">
+    <div class="wp-icon-btn">🏠</div>
+    <div class="wp-icon-btn">👥</div>
+    <div class="wp-icon-btn">🔔</div>
+    <div class="wp-avatar">EC</div>
+  </div>
+</header>
+
+<!-- BODY -->
+<div class="wp-body">
+
+  <!-- SIDEBAR -->
+  <aside class="wp-sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-item active"><span class="sidebar-icon">🏠</span> Home</div>
+      <div class="sidebar-item"><span class="sidebar-icon">💬</span> Chat</div>
+      <div class="sidebar-item"><span class="sidebar-icon">🔔</span> Notifications</div>
+      <div class="sidebar-item"><span class="sidebar-icon">📅</span> Events</div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Your Groups</div>
+      <div class="sidebar-item active">
+        <div class="group-avatar">IRC</div> IRC Program Team
+      </div>
+      <div class="sidebar-item">
+        <div class="group-avatar" style="background:#6366f1;">INT</div> Integrity Org
+      </div>
+      <div class="sidebar-item">
+        <div class="group-avatar" style="background:#059669;">PPM</div> PPM Community
+      </div>
+      <div class="sidebar-item">
+        <div class="group-avatar" style="background:#d97706;">T&S</div> Trust &amp; Safety
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="wp-main">
+    <div class="wp-feed">
+
+      <!-- GROUP HEADER -->
+      <div class="group-cover">
+        <div>
+          <div class="group-cover-title">IRC Program Team</div>
+          <div class="group-cover-sub">Integrity Regulatory Compliance</div>
+        </div>
+      </div>
+      <div class="group-meta-bar">
+        <div class="group-meta-text"><strong>210 members</strong> · Private group · Managed by Evîn Cheikosman</div>
+        <button class="btn-join">+ Invite</button>
+      </div>
+
+      <!-- HPM POST -->
+      <div class="post-card">
+        <div class="post-header">
+          <div class="post-avatar">EC</div>
+          <div class="post-meta">
+            <div class="post-author">Evîn Cheikosman <span class="post-pin">📌 Pinned</span></div>
+            <div class="post-group">posted in <a href="#">IRC Program Team</a> · Program Manager, IRC</div>
+            <div class="post-time">May 1, 2026 at 9:14 AM · 🌐 Organization</div>
+          </div>
+        </div>
+
+        <!-- COLLAPSED BODY -->
+        <div class="post-body" id="post-collapsed">
+<span class="section-head">📋 April 2026 — IRC Program Health (HPM)</span>
+<span style="color:#65676b;font-size:12.5px;">Integrity Regulatory Compliance Program · H1 2026</span>
+
+cc: <span class="post-mention">@Integrity VP</span> <span class="post-mention">@Legal Leads</span> <span class="post-mention">@Policy Leads</span> <span class="post-mention">@Product PPMs</span> <span class="post-mention">@Surface Owners</span>
+
+<span class="divider-line">──────────────────────────────</span>
+<span class="section-head">📊 HAPPENINGS</span>
+This month: <strong>109 requirements cleared</strong> — up from 45 in December (142% increase). The program is accelerating.
+
+• P0 status: 24 obligations active, 88% on track or completed
+• Legal review pipeline: 412 requirements pending IRC Legal review — the team processed 47 this cycle; continued throughput is needed ahead of H2 enforcement deadlines
+• Portfolio: 735+ active requirements across 10+ jurisdictions
+• Velocity trend: 45 → 71 → 88 → 101 → 109 cleared/month (5-month view)
+
+<span class="section-head">TRACK GRADES — April 2026</span>
+<span class="post-grade">PLATFORM_SAFETY_STANDARDS        A+  ✅
+CONTENT_INTEGRITY_REVIEW          A   ✅
+DATA_PRIVACY_COMPLIANCE           A   ✅
+REGULATORY_RESPONSE_PROTOCOLS     B+  🟡
+ENFORCEMENT_DOCUMENTATION         B+  🟡
+LEGAL_OBLIGATION_TRACKING         B   🟡
+POLICY_TRANSPARENCY_STANDARDS     B-  🟠
+REGIONAL_COMPLIANCE_MONITORING    C+  🔴
+CROSS_BORDER_ENFORCEMENT          C   🔴</span>
+
+<button class="see-more-btn" id="see-more-btn" onclick="expandPost()">See more</button>
+        </div>
+
+        <!-- EXPANDED EXTRA CONTENT -->
+        <div class="post-body post-body-extra" id="post-extra">
+<span class="divider-line">──────────────────────────────</span>
+<span class="section-head">👥 PEOPLE</span>
+🙌 Shoutout to <span class="post-mention">@D. Walsh</span> for completing 12 APAC requirements ahead of schedule — PLATFORM_SAFETY_STANDARDS hitting A+ two months running is a direct result of this work.
+
+🙌 Thanks to <span class="post-mention">@K. Ferrara</span> and <span class="post-mention">@L. Harmon</span> for the fast Legal Pod Q turnaround — 47 reviews cleared in a compressed timeline matters.
+
+New to the program or have questions? Your IRC contacts:
+• Product Program Manager (IRC): <span class="post-mention">@Evîn Cheikosman</span>
+• Legal POC: <span class="post-mention">@R. Stavros</span>
+• Policy POC: <span class="post-mention">@K. Ferrara</span>
+
+<span class="divider-line">──────────────────────────────</span>
+<span class="section-head">✨ MOMENTS</span>
+🎯 PLATFORM_SAFETY_STANDARDS: second consecutive A+ — strong track execution
+📅 Reminder: EMEA DSA enforcement deadline — <strong>June 30, 2026</strong>. Surface owners: confirm execution status in iWAM by June 15.
+🚀 IRC Escalation Hub v2.0 is live — now supports L2 routing and AI-assisted triage. Submit topics directly via the hub.
+📊 Dashboard update: Integrity Tracks Health now refreshes daily. Grades visible in real time — no need to wait for the HPM.
+
+<span class="divider-line">──────────────────────────────</span>
+<span class="section-head">📚 RESOURCES</span>
+→ <span class="post-mention">People &amp; Process</span> — IRC roles, processes, and onboarding guide
+→ <span class="post-mention">IRC Escalation Hub</span> — submit topics for L1/L2 SteerCo review
+→ <span class="post-mention">RITE Signal Tool</span> — flag regulatory signals for triage
+→ <span class="post-mention">iWAM</span> — obligations &amp; requirements tracking system
+→ Questions? Tag <span class="post-mention">@Evîn Cheikosman</span> or post in <span class="post-mention">#irc-program-updates</span>
+        </div>
+
+        <!-- REACTIONS SUMMARY -->
+        <div class="post-reactions-summary">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div class="rxn-emojis">
+              <div class="rxn-emoji" style="background:#1877f2;">👍</div>
+              <div class="rxn-emoji" style="background:#f59e0b;margin-left:-6px;">🎉</div>
+              <div class="rxn-emoji" style="background:#ef4444;margin-left:-6px;">❤️</div>
+            </div>
+            <span class="rxn-count" id="rxn-count">34</span>
+          </div>
+          <span>12 comments</span>
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div class="post-actions">
+          <button class="action-btn" id="like-btn" onclick="toggleLike()">
+            <span class="action-icon">👍</span> Like
+          </button>
+          <button class="action-btn">
+            <span class="action-icon">💬</span> Comment
+          </button>
+          <button class="action-btn">
+            <span class="action-icon">↗</span> Share
+          </button>
+        </div>
+
+        <!-- COMMENTS -->
+        <div class="post-comments">
+          <div class="comment">
+            <div class="comment-avatar" style="background:#6366f1;">VP</div>
+            <div>
+              <div class="comment-bubble">
+                <div class="comment-name">Cross-Functional VP</div>
+                <div class="comment-text">Great work driving roadmapping across the different regions. This is the best it has gone in the last two years! 🙌</div>
+              </div>
+              <div class="comment-actions">
+                <span class="comment-action">Like</span>
+                <span class="comment-action">Reply</span>
+                <span class="comment-time">2h</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="comment">
+            <div class="comment-avatar" style="background:#059669;">KF</div>
+            <div>
+              <div class="comment-bubble">
+                <div class="comment-name">K. Ferrara</div>
+                <div class="comment-text"><span class="post-mention">@D. Walsh</span> well-deserved shoutout 👏 The APAC work was excellent this cycle.</div>
+              </div>
+              <div class="comment-actions">
+                <span class="comment-action">Like</span>
+                <span class="comment-action">Reply</span>
+                <span class="comment-time">1h</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="comment">
+            <div class="comment-avatar" style="background:#d97706;">LH</div>
+            <div>
+              <div class="comment-bubble">
+                <div class="comment-name">L. Harmon</div>
+                <div class="comment-text">Thanks for the update! Will the June 30 deadline require additional headcount support on the Legal review side? Happy to escalate if needed.</div>
+              </div>
+              <div class="comment-actions">
+                <span class="comment-action">Like</span>
+                <span class="comment-action">Reply</span>
+                <span class="comment-time">45m</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="add-comment">
+            <div class="add-comment-avatar">EC</div>
+            <input class="add-comment-input" placeholder="Write a comment…" />
+          </div>
+        </div>
+
+      </div><!-- /post-card -->
+    </div><!-- /wp-feed -->
+  </main>
+
+</div><!-- /wp-body -->
+
+<!-- Disclaimer -->
+<div style="position:fixed;bottom:0;left:0;right:0;padding:4px 14px;background:rgba(248,249,251,0.96);border-top:1px solid #e0e2e6;font-size:10px;color:#8a8d91;z-index:500;text-align:center;letter-spacing:.01em;">
+  Illustrative mockup — all names, data, and content are entirely fictional. No proprietary or confidential information is depicted.
+</div>
+
+<!-- Tour cursor -->
+<div id="tc"><div class="tcr"></div></div>
+
+<script>
+  let liked = false;
+  let expanded = false;
+
+  function expandPost() {
+    if (expanded) return;
+    expanded = true;
+    document.getElementById('post-collapsed').classList.remove('post-body-collapsed');
+    document.getElementById('see-more-btn').style.display = 'none';
+    document.getElementById('post-extra').classList.add('open');
+  }
+
+  function toggleLike() {
+    liked = !liked;
+    const btn = document.getElementById('like-btn');
+    const count = document.getElementById('rxn-count');
+    btn.classList.toggle('reacted', liked);
+    btn.innerHTML = liked
+      ? '<span class="action-icon">👍</span> Liked'
+      : '<span class="action-icon">👍</span> Like';
+    count.textContent = liked ? '35' : '34';
+  }
+
+  // ── ANIMATED TOUR ──
+  // Steps: expand post → click like → point at resources section
+  const tourSteps = [
+    {
+      el: () => document.getElementById('see-more-btn'),
+      action: expandPost
+    },
+    {
+      el: () => document.getElementById('like-btn'),
+      action: () => { if (!liked) toggleLike(); }
+    },
+    {
+      el: () => document.querySelector('.add-comment-input'),
+      action: () => {}
+    },
+  ];
+
+  let idx = 0, alive = true, t;
+  const cur = document.getElementById('tc');
+
+  function tourStep() {
+    if (!alive) return;
+    const step = tourSteps[idx % tourSteps.length];
+    const el = step.el();
+    if (!el) { idx++; t = setTimeout(tourStep, 2800); return; }
+
+    const r = el.getBoundingClientRect();
+    cur.style.left = (r.left + r.width / 2) + 'px';
+    cur.style.top  = (r.top + r.height / 2) + 'px';
+    cur.style.opacity = '1';
+
+    setTimeout(() => {
+      if (!alive) return;
+      cur.classList.add('ck');
+      setTimeout(() => {
+        if (!alive) return;
+        cur.classList.remove('ck');
+        step.action();
+        idx++;
+        t = setTimeout(tourStep, 3200);
+      }, 220);
+    }, 800);
+  }
+
+  const ts = setTimeout(tourStep, 2000);
+  function stopTour() { alive=false; clearTimeout(t); clearTimeout(ts); cur.style.opacity='0'; }
+  document.addEventListener('click', stopTour, {once:true});
+</script>
+</body>
+</html>

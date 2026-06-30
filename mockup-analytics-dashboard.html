@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Integrity Tracks Health</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#fff;font-size:13px;color:#1c1e21;display:flex;height:100vh;overflow:hidden;}
+
+    /* ── LEFT INFO PANEL ── */
+    .left-panel{width:230px;border-right:1px solid #e0e2e6;display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;background:#fafbfc;}
+
+    .app-brand{padding:18px 18px 14px;border-bottom:1px solid #e0e2e6;}
+    .brand-logo{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#e85d04,#f48c06);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:22px;margin-bottom:12px;}
+    .brand-name{font-size:15px;font-weight:800;color:#1c1e21;letter-spacing:-.02em;line-height:1.25;margin-bottom:6px;}
+    .brand-tagline{font-size:12px;color:#65676b;line-height:1.55;}
+
+    .filter-badges{padding:11px 18px;border-bottom:1px solid #e0e2e6;display:flex;flex-wrap:wrap;gap:7px;}
+    .fbadge{padding:3px 11px;border-radius:12px;font-size:11.5px;font-weight:700;border:1.5px solid;}
+    .fbadge-tier{background:#fff3cd;border-color:#f59e0b;color:#92400e;}
+    .fbadge-perf{background:#dcfce7;border-color:#22c55e;color:#15803d;}
+
+    .nuances-section{border-bottom:1px solid #e0e2e6;}
+    .nuances-toggle{padding:10px 18px;font-size:12px;font-weight:700;color:#1c1e21;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;letter-spacing:.04em;}
+    .nuances-toggle:hover{background:#f0f2f5;}
+    .nuances-chevron{font-size:10px;color:#65676b;transition:transform .2s;}
+    .nuances-chevron.open{transform:rotate(180deg);}
+    .nuances-body{padding:0 18px 12px;display:none;}
+    .nuances-body.open{display:block;}
+    .nuances-item{font-size:12px;color:#444;line-height:1.6;margin-bottom:8px;padding-left:10px;border-left:2px solid #e0e2e6;}
+    .nuances-item:last-child{margin-bottom:0;}
+
+    .commentary-section{flex:1;padding:14px 18px;}
+    .commentary-title{font-size:11px;font-weight:700;color:#8a8d91;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
+    .commentary-date{font-size:11.5px;color:#8a8d91;margin-bottom:7px;}
+    .commentary-box{background:#fff;border:1px solid #e0e2e6;border-radius:6px;padding:11px 13px;font-size:12px;color:#444;line-height:1.6;}
+
+    /* ── MAIN CONTENT ── */
+    .main-content{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+    .main-scroll{flex:1;overflow-y:auto;padding:20px 28px 80px;}
+
+    .page-heading{font-size:19px;font-weight:800;letter-spacing:-.02em;margin-bottom:16px;}
+
+    /* ── DETAIL BANNER ── */
+    .detail-banner{background:#eef2ff;border:1px solid #c7d2fe;border-radius:6px;padding:13px 16px;margin-bottom:16px;display:none;}
+    .detail-banner.visible{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
+    .detail-close{color:#8a8d91;cursor:pointer;font-size:16px;flex-shrink:0;line-height:1;}
+    .detail-track{font-family:'SF Mono','Monaco','Consolas',monospace;font-size:12px;font-weight:700;color:#3730a3;margin-bottom:8px;}
+    .detail-metrics{display:flex;gap:24px;}
+    .dm-item .dm-val{font-size:20px;font-weight:800;color:#1A3ECA;}
+    .dm-item .dm-label{font-size:11px;color:#65676b;margin-top:2px;}
+
+    /* ── FORMULA ── */
+    .formula-bar{border:1px solid #e0e2e6;border-radius:6px;overflow:hidden;margin-bottom:16px;}
+    .formula-toggle-row{padding:11px 16px;background:#f8f9fb;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;}
+    .formula-toggle-row:hover{background:#f0f2f5;}
+    .formula-toggle-label{font-size:13px;font-weight:700;color:#1c1e21;}
+    .formula-toggle-hint{font-size:11.5px;color:#1A3ECA;}
+    .formula-body{padding:14px 16px;display:none;background:#fff;}
+    .formula-body.open{display:block;}
+    .formula-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .formula-item{padding:11px 13px;background:#fafbfc;border:1px solid #e8eaed;border-radius:6px;}
+    .fi-pct{font-size:14px;font-weight:800;color:#1A3ECA;margin-bottom:3px;}
+    .fi-label{font-size:12.5px;font-weight:700;margin-bottom:4px;}
+    .fi-desc{font-size:11.5px;color:#65676b;line-height:1.55;}
+
+    /* ── GRADES TABLE ── */
+    .table-section-title{font-size:15px;font-weight:700;margin-bottom:6px;}
+    .table-heading{font-size:12px;color:#65676b;margin-bottom:10px;font-style:italic;}
+    .grades-wrap{border:1px solid #e0e2e6;border-radius:6px;overflow-x:auto;}
+    table.grades-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+    .grades-table th{text-align:left;padding:9px 12px;background:#f8f9fb;font-size:11px;font-weight:700;color:#8a8d91;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid #e0e2e6;white-space:nowrap;}
+    .grades-table td{padding:9px 12px;border-bottom:1px solid #f0f2f5;vertical-align:middle;}
+    .grades-table tr:hover td{background:#f8f9ff;cursor:pointer;}
+    .grades-table tr.selected td{background:#eef2ff;}
+    .grades-table tbody tr:last-child td{border-bottom:none;}
+    .track-name{font-family:'SF Mono','Monaco','Consolas',monospace;font-size:11.5px;color:#1c1e21;font-weight:600;}
+
+    .grade-badge{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:6px;font-weight:800;font-size:13px;}
+    .g-aplus{background:#bbf7d0;color:#15803d;}
+    .g-a{background:#dcfce7;color:#16a34a;}
+    .g-bplus{background:#fef9c3;color:#a16207;}
+    .g-b{background:#fef3c7;color:#d97706;}
+    .g-bminus{background:#fed7aa;color:#c2410c;}
+    .g-cplus{background:#fecaca;color:#dc2626;}
+    .g-c{background:#fee2e2;color:#b91c1c;}
+
+    .score-val{font-weight:700;}
+    .null-val{color:#ccc;font-size:11px;}
+
+    /* ── DATAMATE FLOATING BUTTON + POPUP ── */
+    .dm-fab{position:fixed;bottom:28px;right:20px;width:44px;height:44px;border-radius:50%;background:#1A3ECA;color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(26,62,202,.38);z-index:200;transition:transform .15s,box-shadow .15s;}
+    .dm-fab:hover{transform:scale(1.08);box-shadow:0 6px 20px rgba(26,62,202,.45);}
+    .dm-fab-label{position:fixed;bottom:35px;right:72px;background:#1c1e21;color:#fff;font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:6px;z-index:200;pointer-events:none;white-space:nowrap;opacity:0;transition:opacity .2s;}
+    .dm-fab:hover ~ .dm-fab-label{opacity:1;}
+
+    .dm-popup{position:fixed;bottom:82px;right:20px;width:300px;background:#fff;border:1px solid #e0e2e6;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.14);z-index:199;display:none;flex-direction:column;overflow:hidden;max-height:380px;}
+    .dm-popup.open{display:flex;}
+    .dm-popup-header{background:#f0f4ff;padding:12px 14px 10px;border-bottom:1px solid #dce8ff;display:flex;align-items:flex-start;justify-content:space-between;}
+    .dm-popup-title{font-size:14px;font-weight:800;color:#1A3ECA;margin-bottom:2px;}
+    .dm-popup-sub{font-size:11.5px;color:#65676b;}
+    .dm-popup-close{color:#8a8d91;cursor:pointer;font-size:15px;line-height:1;padding:2px;}
+    .dm-suggestions{padding:8px 12px;border-bottom:1px solid #e8eaed;}
+    .dm-suggestion{background:#f0f4ff;border-radius:6px;padding:7px 10px;font-size:11.5px;color:#1A3ECA;cursor:pointer;margin-bottom:5px;line-height:1.4;}
+    .dm-suggestion:hover{background:#dce8ff;}
+    .dm-suggestion:last-child{margin-bottom:0;}
+    .dm-chat-area{flex:1;overflow-y:auto;padding:10px 12px;}
+    .dm-msg{padding:8px 10px;border-radius:6px;font-size:12px;line-height:1.5;margin-bottom:7px;}
+    .dm-msg.bot{background:#f0f4ff;color:#1c1e21;}
+    .dm-msg.user{background:#dce8ff;color:#1A3ECA;text-align:right;}
+    .dm-input-row{padding:9px 12px;border-top:1px solid #e8eaed;display:flex;gap:6px;}
+    .dm-input{flex:1;border:1px solid #ccd0d5;border-radius:6px;padding:6px 10px;font-size:12px;font-family:inherit;}
+    .dm-send{background:#1A3ECA;color:#fff;border:none;border-radius:6px;width:28px;font-size:14px;cursor:pointer;flex-shrink:0;}
+
+    /* ── TOUR CURSOR ── */
+    #tc{position:fixed;width:20px;height:20px;border-radius:50%;background:rgba(26,62,202,.18);border:2px solid #1A3ECA;transform:translate(-50%,-50%);pointer-events:none;z-index:9999;opacity:0;transition:left .55s cubic-bezier(.4,0,.2,1),top .55s cubic-bezier(.4,0,.2,1),opacity .3s;}
+    #tc.ck{background:rgba(26,62,202,.38);transform:translate(-50%,-50%) scale(.65);transition:transform .15s,background .15s;}
+    .tcr{position:absolute;inset:-7px;border-radius:50%;border:1.5px solid rgba(26,62,202,.3);animation:tr 1.4s ease infinite;}
+    @keyframes tr{0%{transform:scale(.7);opacity:.9}100%{transform:scale(1.9);opacity:0}}
+  </style>
+</head>
+<body>
+
+<!-- LEFT INFO PANEL -->
+<aside class="left-panel">
+  <div class="app-brand">
+    <div class="brand-logo">◈</div>
+    <div class="brand-name">Integrity Tracks Health</div>
+    <div class="brand-tagline">Automates and enhances the monthly report card process for Meta's integrity tracks.</div>
+  </div>
+
+  <div class="filter-badges">
+    <span class="fbadge fbadge-tier">Tier 3</span>
+    <span class="fbadge fbadge-perf">Performance Guaranteed</span>
+  </div>
+
+  <div class="nuances-section">
+    <div class="nuances-toggle" id="nuances-toggle" onclick="toggleNuances()">
+      CERTAIN NUANCES
+      <span class="nuances-chevron" id="nuances-chev">▾</span>
+    </div>
+    <div class="nuances-body" id="nuances-body">
+      <div class="nuances-item">Previously agreed-upon actions, deprioritized obligations, and legacy obligations are not included in the calculation of track grades.</div>
+      <div class="nuances-item">Please ensure that exceptions to required regulatory work are minimized and that all necessary work is completed. This will help reduce the number of untracked nuances.</div>
+    </div>
+  </div>
+
+  <div class="commentary-section">
+    <div class="commentary-title">Commentary</div>
+    <div class="commentary-date">Mon, Jun 23 · <span style="color:#1A3ECA;">POC</span></div>
+    <div class="commentary-box">[Jun-23] No grade changes since last cycle. Platform Safety Standards track maintaining A+ across all requirement categories. Regulatory Response Protocols improved from B to B+ following completion of documentation backlog.</div>
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+  <div class="main-scroll">
+    <div class="page-heading">Track Grades</div>
+
+    <!-- DETAIL BANNER -->
+    <div class="detail-banner" id="detail-banner">
+      <div>
+        <div class="detail-track" id="detail-track-name">PLATFORM_SAFETY_STANDARDS</div>
+        <div class="detail-metrics">
+          <div class="dm-item"><div class="dm-val" id="detail-grade">A+</div><div class="dm-label">Grade</div></div>
+          <div class="dm-item"><div class="dm-val" id="detail-score">1.00</div><div class="dm-label">Score</div></div>
+          <div class="dm-item"><div class="dm-val" id="detail-reqs">12</div><div class="dm-label">Requirements</div></div>
+          <div class="dm-item"><div class="dm-val" id="detail-pastdue" style="color:#16a34a;">0</div><div class="dm-label">Past Due</div></div>
+        </div>
+      </div>
+      <span class="detail-close" onclick="closeDetail()">✕</span>
+    </div>
+
+    <!-- GRADE WEIGHTING FORMULA -->
+    <div class="formula-bar" id="formula-bar">
+      <div class="formula-toggle-row" onclick="toggleFormula()">
+        <span class="formula-toggle-label" id="formula-label">▶ Grade Weighting Formula</span>
+        <span class="formula-toggle-hint" id="formula-hint">Click to expand</span>
+      </div>
+      <div class="formula-body" id="formula-body">
+        <div class="formula-grid">
+          <div class="formula-item">
+            <div class="fi-pct">50%</div>
+            <div class="fi-label">RRC Workflow</div>
+            <div class="fi-desc">The Regulatory Readiness Completion Flow ensures all requirements are thoroughly scoped, documented, and prepared for execution.</div>
+          </div>
+          <div class="formula-item">
+            <div class="fi-pct">12.5%</div>
+            <div class="fi-label">Product Updates</div>
+            <div class="fi-desc">Track Owners collaborate with Surface Owners to provide monthly compliance solution updates, escalations, and roadblock reporting.</div>
+          </div>
+          <div class="formula-item">
+            <div class="fi-pct">12.5%</div>
+            <div class="fi-label">Ops Updates</div>
+            <div class="fi-desc">Ops Owners provide monthly updates on compliance solution progress and operational efficiencies toward specified obligations.</div>
+          </div>
+          <div class="formula-item">
+            <div class="fi-pct">25%</div>
+            <div class="fi-label">Requirements Past Due</div>
+            <div class="fi-desc">Build work must be completed by the internal execution deadline set before the obligation's enforcement date.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRADES TABLE -->
+    <div class="table-section-title">Integrity Track Grades</div>
+    <div class="table-heading">Click on a track to update the tables below</div>
+    <div class="grades-wrap">
+      <table class="grades-table" id="grades-table">
+        <thead>
+          <tr>
+            <th>Track Name</th>
+            <th>Grade</th>
+            <th>Grade Score</th>
+            <th>Total Requirements</th>
+            <th>Past Due</th>
+            <th>RRC Workflow Score</th>
+            <th>Reqs Needing Improved RRC Workflow</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr onclick="selectTrack(this,'PLATFORM_SAFETY_STANDARDS','A+','1.00','12','0')">
+            <td><span class="track-name">PLATFORM_SAFETY_STANDARDS</span></td>
+            <td><span class="grade-badge g-aplus">A+</span></td>
+            <td><span class="score-val">1.00</span></td>
+            <td>12</td>
+            <td class="null-val">NULL</td>
+            <td class="null-val">NULL</td>
+            <td class="null-val">NULL</td>
+          </tr>
+          <tr onclick="selectTrack(this,'CONTENT_INTEGRITY_REVIEW','A','0.95','8','1')">
+            <td><span class="track-name">CONTENT_INTEGRITY_REVIEW</span></td>
+            <td><span class="grade-badge g-a">A</span></td>
+            <td><span class="score-val">0.95</span></td>
+            <td>8</td>
+            <td>1</td>
+            <td><span class="score-val">0.92</span></td>
+            <td class="null-val">NULL</td>
+          </tr>
+          <tr onclick="selectTrack(this,'DATA_PRIVACY_COMPLIANCE','A','0.93','22','0')">
+            <td><span class="track-name">DATA_PRIVACY_COMPLIANCE</span></td>
+            <td><span class="grade-badge g-a">A</span></td>
+            <td><span class="score-val">0.93</span></td>
+            <td>22</td>
+            <td class="null-val">NULL</td>
+            <td><span class="score-val">0.91</span></td>
+            <td class="null-val">NULL</td>
+          </tr>
+          <tr onclick="selectTrack(this,'REGULATORY_RESPONSE_PROTOCOLS','B+','0.87','45','1')">
+            <td><span class="track-name">REGULATORY_RESPONSE_PROTOCOLS</span></td>
+            <td><span class="grade-badge g-bplus">B+</span></td>
+            <td><span class="score-val">0.87</span></td>
+            <td>45</td>
+            <td>1</td>
+            <td><span class="score-val">0.84</span></td>
+            <td style="font-size:11px;color:#65676b;">["REQ-0184","REQ-0192"]</td>
+          </tr>
+          <tr onclick="selectTrack(this,'ENFORCEMENT_DOCUMENTATION','B+','0.85','31','1')">
+            <td><span class="track-name">ENFORCEMENT_DOCUMENTATION</span></td>
+            <td><span class="grade-badge g-bplus">B+</span></td>
+            <td><span class="score-val">0.85</span></td>
+            <td>31</td>
+            <td>1</td>
+            <td class="null-val">NULL</td>
+            <td class="null-val">NULL</td>
+          </tr>
+          <tr onclick="selectTrack(this,'LEGAL_OBLIGATION_TRACKING','B','0.82','19','0')">
+            <td><span class="track-name">LEGAL_OBLIGATION_TRACKING</span></td>
+            <td><span class="grade-badge g-b">B</span></td>
+            <td><span class="score-val">0.82</span></td>
+            <td>19</td>
+            <td class="null-val">NULL</td>
+            <td><span class="score-val">0.79</span></td>
+            <td class="null-val">NULL</td>
+          </tr>
+          <tr onclick="selectTrack(this,'POLICY_TRANSPARENCY_STANDARDS','B-','0.76','62','3')">
+            <td><span class="track-name">POLICY_TRANSPARENCY_STANDARDS</span></td>
+            <td><span class="grade-badge g-bminus">B-</span></td>
+            <td><span class="score-val">0.76</span></td>
+            <td>62</td>
+            <td>3</td>
+            <td><span class="score-val">0.73</span></td>
+            <td style="font-size:11px;color:#65676b;">["REQ-0241","REQ-0256","REQ-0261"]</td>
+          </tr>
+          <tr onclick="selectTrack(this,'THIRD_PARTY_AUDIT_READINESS','B-','0.74','28','2')">
+            <td><span class="track-name">THIRD_PARTY_AUDIT_READINESS</span></td>
+            <td><span class="grade-badge g-bminus">B-</span></td>
+            <td><span class="score-val">0.74</span></td>
+            <td>28</td>
+            <td>2</td>
+            <td><span class="score-val">0.71</span></td>
+            <td class="null-val">NULL</td>
+          </tr>
+          <tr onclick="selectTrack(this,'REGIONAL_COMPLIANCE_MONITORING','C+','0.71','41','4')">
+            <td><span class="track-name">REGIONAL_COMPLIANCE_MONITORING</span></td>
+            <td><span class="grade-badge g-cplus">C+</span></td>
+            <td><span class="score-val">0.71</span></td>
+            <td>41</td>
+            <td>4</td>
+            <td><span class="score-val">0.68</span></td>
+            <td style="font-size:11px;color:#65676b;">["REQ-0178","REQ-0183","REQ-0190"]</td>
+          </tr>
+          <tr onclick="selectTrack(this,'CROSS_BORDER_ENFORCEMENT','C','0.64','17','5')">
+            <td><span class="track-name">CROSS_BORDER_ENFORCEMENT</span></td>
+            <td><span class="grade-badge g-c">C</span></td>
+            <td><span class="score-val">0.64</span></td>
+            <td>17</td>
+            <td>5</td>
+            <td><span class="score-val">0.61</span></td>
+            <td style="font-size:11px;color:#65676b;">["REQ-0144","REQ-0151","REQ-0158"]</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- DATAMATE FLOATING BUTTON -->
+<div class="dm-fab" id="dm-fab" onclick="toggleDatamate()">✦</div>
+<div class="dm-fab-label">Ask Datamate</div>
+
+<!-- DATAMATE POPUP -->
+<div class="dm-popup" id="dm-popup">
+  <div class="dm-popup-header">
+    <div>
+      <div class="dm-popup-title">Welcome to Datamate!</div>
+      <div class="dm-popup-sub">How can I help you today?</div>
+    </div>
+    <span class="dm-popup-close" onclick="toggleDatamate()">✕</span>
+  </div>
+  <div class="dm-suggestions">
+    <div class="dm-suggestion" onclick="askDatamate(this.textContent)">Which metrics show the strongest trend over the past month?</div>
+    <div class="dm-suggestion" onclick="askDatamate(this.textContent)">Tell me about the widgets on this dashboard.</div>
+    <div class="dm-suggestion" onclick="askDatamate(this.textContent)">Are there any anomalies visible across any of the metrics?</div>
+  </div>
+  <div class="dm-chat-area" id="dm-chat">
+    <div class="dm-msg bot">I can analyze your track grades, surface requirement gaps, flag at-risk tracks, or explain how any metric is calculated. What would you like to know?</div>
+  </div>
+  <div class="dm-input-row">
+    <input class="dm-input" id="dm-input" placeholder="Send a message..." />
+    <button class="dm-send" onclick="sendDmMsg()">→</button>
+  </div>
+</div>
+
+<!-- Disclaimer -->
+<div style="position:fixed;bottom:0;left:0;right:0;padding:4px 14px;background:rgba(248,249,251,0.96);border-top:1px solid #e0e2e6;font-size:10px;color:#8a8d91;z-index:100;text-align:center;letter-spacing:.01em;">
+  Illustrative mockup — all names, data, and content are entirely fictional. No proprietary or confidential information is depicted.
+</div>
+
+<!-- Tour cursor -->
+<div id="tc"><div class="tcr"></div></div>
+
+<script>
+  // ── NUANCES TOGGLE ──
+  function toggleNuances() {
+    const body = document.getElementById('nuances-body');
+    const chev = document.getElementById('nuances-chev');
+    const open = body.classList.toggle('open');
+    chev.classList.toggle('open', open);
+  }
+
+  // ── FORMULA TOGGLE ──
+  function toggleFormula() {
+    const body = document.getElementById('formula-body');
+    const hint = document.getElementById('formula-hint');
+    const label = document.getElementById('formula-label');
+    const open = body.classList.toggle('open');
+    hint.textContent = open ? 'Click to collapse' : 'Click to expand';
+    label.textContent = (open ? '▼' : '▶') + ' Grade Weighting Formula';
+  }
+
+  // ── ROW SELECTION ──
+  function selectTrack(row, name, grade, score, reqs, pastDue) {
+    document.querySelectorAll('.grades-table tbody tr').forEach(r => r.classList.remove('selected'));
+    row.classList.add('selected');
+    document.getElementById('detail-track-name').textContent = name;
+    document.getElementById('detail-grade').textContent = grade;
+    document.getElementById('detail-score').textContent = score;
+    document.getElementById('detail-reqs').textContent = reqs;
+    const pd = document.getElementById('detail-pastdue');
+    pd.textContent = pastDue;
+    pd.style.color = parseInt(pastDue) > 0 ? '#dc2626' : '#16a34a';
+    document.getElementById('detail-banner').classList.add('visible');
+    document.getElementById('detail-banner').scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+
+  function closeDetail() {
+    document.getElementById('detail-banner').classList.remove('visible');
+    document.querySelectorAll('.grades-table tbody tr').forEach(r => r.classList.remove('selected'));
+  }
+
+  // ── DATAMATE POPUP ──
+  function toggleDatamate() {
+    document.getElementById('dm-popup').classList.toggle('open');
+  }
+
+  function askDatamate(msg) {
+    const chat = document.getElementById('dm-chat');
+    const uMsg = document.createElement('div');
+    uMsg.className = 'dm-msg user';
+    uMsg.textContent = msg;
+    chat.appendChild(uMsg);
+    // hide suggestion after use
+    setTimeout(() => {
+      const bMsg = document.createElement('div');
+      bMsg.className = 'dm-msg bot';
+      bMsg.textContent = 'Based on the current data, CROSS_BORDER_ENFORCEMENT (C, 0.64) and REGIONAL_COMPLIANCE_MONITORING (C+, 0.71) show the most concerning trends. Both have multiple past-due requirements and below-threshold RRC workflow scores.';
+      chat.appendChild(bMsg);
+      chat.scrollTop = chat.scrollHeight;
+    }, 600);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  function sendDmMsg() {
+    const inp = document.getElementById('dm-input');
+    const msg = inp.value.trim();
+    if (!msg) return;
+    askDatamate(msg);
+    inp.value = '';
+  }
+
+  document.getElementById('dm-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') sendDmMsg();
+  });
+
+  // ── ANIMATED TOUR ──
+  const rows = document.querySelectorAll('.grades-table tbody tr');
+  const tourSteps = [
+    {el: () => document.querySelector('.formula-toggle-row'),  action: toggleFormula},
+    {el: () => rows[3],  action: () => rows[3].click()},
+    {el: () => rows[8],  action: () => rows[8].click()},
+    {el: () => document.getElementById('dm-fab'), action: () => { if (!document.getElementById('dm-popup').classList.contains('open')) toggleDatamate(); }},
+    {el: () => rows[0],  action: () => { if (document.getElementById('dm-popup').classList.contains('open')) toggleDatamate(); closeDetail(); }},
+  ];
+
+  let idx = 0, alive = true, t;
+  const cur = document.getElementById('tc');
+
+  function tourStep() {
+    if (!alive) return;
+    const step = tourSteps[idx % tourSteps.length];
+    const el = step.el();
+    if (!el) { idx++; t = setTimeout(tourStep, 2800); return; }
+
+    const r = el.getBoundingClientRect();
+    cur.style.left = (r.left + r.width * .42) + 'px';
+    cur.style.top  = (r.top + r.height / 2) + 'px';
+    cur.style.opacity = '1';
+
+    setTimeout(() => {
+      if (!alive) return;
+      cur.classList.add('ck');
+      setTimeout(() => {
+        if (!alive) return;
+        cur.classList.remove('ck');
+        step.action();
+        idx++;
+        t = setTimeout(tourStep, 3000);
+      }, 220);
+    }, 720);
+  }
+
+  const ts = setTimeout(tourStep, 2000);
+  function stopTour() { alive=false; clearTimeout(t); clearTimeout(ts); cur.style.opacity='0'; }
+  document.addEventListener('click', stopTour, {once:true});
+</script>
+</body>
+</html>

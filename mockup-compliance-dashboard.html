@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — Integrity Regulatory Control Center</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#fff;font-size:13px;color:#1c1e21;display:flex;height:100vh;overflow:hidden;}
+
+    /* ── SIDEBAR ── */
+    .sidebar{width:200px;background:#f7f8fa;border-right:1px solid #e0e2e6;display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
+    .app-logo{padding:12px 14px 10px;display:flex;align-items:center;gap:9px;border-bottom:1px solid #e0e2e6;}
+    .app-icon{width:28px;height:28px;border-radius:50%;background:#1A3ECA;color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .app-name{font-size:11.5px;font-weight:700;color:#1c1e21;line-height:1.3;}
+
+    .test-banner{background:#fff8e1;border-bottom:1px solid #ffe082;padding:5px 12px;font-size:11px;color:#b07800;display:flex;align-items:center;gap:5px;}
+
+    .nav-group{padding:6px 0;}
+    .nav-group-label{font-size:12px;font-weight:700;color:#1c1e21;padding:6px 14px 3px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
+    .nav-group-label .chevron{font-size:10px;color:#8a8d91;}
+    .nav-item{display:block;padding:6px 14px 6px 20px;font-size:12.5px;color:#444;cursor:pointer;border-radius:0;}
+    .nav-item:hover{background:#eef0f4;}
+    .nav-item.active{background:#dce8ff;color:#1A3ECA;font-weight:600;}
+    .nav-item .nav-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:#1A3ECA;margin-left:6px;vertical-align:middle;opacity:.55;animation:dp 2.5s ease infinite;}
+    @keyframes dp{0%,100%{opacity:.55;transform:scale(1)}50%{opacity:.15;transform:scale(.65)}}
+
+    .nav-section-divider{border-bottom:1px solid #e0e2e6;margin:2px 0;}
+    .nav-collapsed-group{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;font-size:12.5px;color:#444;cursor:pointer;}
+    .nav-collapsed-group:hover{background:#eef0f4;}
+    .nav-collapsed-group .g-icon{font-size:12px;opacity:.65;margin-right:6px;}
+
+    .sidebar-footer{margin-top:auto;border-top:1px solid #e0e2e6;padding:10px 14px;display:flex;gap:10px;}
+    .sf-icon{width:20px;height:20px;border-radius:50%;background:#e0e2e6;display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;}
+
+    /* ── MAIN ── */
+    .main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+
+    /* ── PAGE HEADER ── */
+    .page-header{padding:12px 24px;border-bottom:1px solid #e8eaed;display:flex;align-items:center;justify-content:space-between;background:#fff;flex-shrink:0;}
+    .page-title{font-size:20px;font-weight:700;letter-spacing:-.02em;display:flex;align-items:center;gap:12px;}
+    .halves-pill{display:inline-flex;align-items:center;gap:5px;border:1px solid #ccd0d5;border-radius:16px;padding:4px 12px;font-size:12.5px;font-weight:500;color:#444;cursor:pointer;}
+    .btn-hpm{background:#fff;border:1px solid #1A3ECA;color:#1A3ECA;border-radius:6px;padding:6px 14px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;}
+    .btn-hpm:hover{background:#f0f4ff;}
+
+    /* ── SCROLLABLE BODY ── */
+    .page-body{flex:1;overflow-y:auto;padding:16px 24px 24px;}
+
+    /* ── TLDR ── */
+    .tldr-block{border:1px solid #e8eaed;border-radius:6px;padding:12px 16px;margin-bottom:16px;background:#fafbfc;}
+    .tldr-period{font-size:11px;color:#8a8d91;font-weight:600;letter-spacing:.05em;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+    .tldr-period-badge{background:#e8eef9;color:#1A3ECA;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:.04em;}
+    .tldr-label{font-size:11.5px;font-weight:700;color:#1c1e21;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;}
+    .tldr-text{font-size:12.5px;color:#1c1e21;line-height:1.65;font-weight:500;}
+    .exec-divider{border-top:1px solid #e8eaed;margin:10px 0 8px;}
+    .exec-label{font-size:11px;font-weight:700;color:#8a8d91;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;}
+    .exec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:8px;}
+    .exec-item{background:#fff;border:1px solid #e8eaed;border-radius:5px;padding:7px 10px;}
+    .exec-val{font-size:15px;font-weight:800;color:#1A3ECA;letter-spacing:-.02em;}
+    .exec-desc{font-size:10.5px;color:#65676b;margin-top:2px;line-height:1.3;}
+    .tldr-note{font-size:11px;color:#8a8d91;font-style:italic;}
+
+    /* ── IN FOCUS ── */
+    .section-title{font-size:15px;font-weight:700;margin-bottom:10px;letter-spacing:-.01em;}
+    .in-focus-card{border:1px solid #e8eaed;border-radius:6px;overflow:hidden;margin-bottom:16px;}
+    table.if-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+    .if-table th{text-align:left;padding:8px 14px;background:#f8f9fb;font-size:11.5px;font-weight:600;color:#65676b;border-bottom:1px solid #e8eaed;}
+    .if-table td{padding:9px 14px;border-bottom:1px solid #f0f2f5;}
+    .if-table tr:last-child td{border-bottom:none;font-weight:700;}
+    .if-table tr:last-child td:first-child{font-weight:700;}
+    .p-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11.5px;font-weight:700;}
+    .p0{background:#fee2e2;color:#dc2626;}
+    .p1{background:#fef3c7;color:#d97706;}
+    .p2{background:#f0f2f5;color:#65676b;}
+    .link-num{color:#1A3ECA;font-weight:600;text-decoration:underline;cursor:pointer;}
+
+    /* ── INTAKE VOLUME ── */
+    .intake-card{border:1px solid #e8eaed;border-radius:6px;overflow:hidden;margin-bottom:16px;}
+    .intake-sub{font-size:12px;color:#65676b;padding:8px 14px;border-bottom:1px solid #e8eaed;font-style:italic;}
+    table.iv-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+    .iv-table th{text-align:left;padding:8px 14px;background:#f8f9fb;font-size:11.5px;font-weight:600;color:#65676b;border-bottom:1px solid #e8eaed;}
+    .iv-table td{padding:8px 14px;border-bottom:1px solid #f0f2f5;color:#1c1e21;}
+    .iv-table tr:last-child td{border-bottom:none;}
+    .iv-val{font-weight:600;}
+
+    /* ── TABS ── */
+    .tabs-bar{display:flex;gap:0;border-bottom:1px solid #e8eaed;margin-bottom:0;}
+    .tab{padding:9px 16px;font-size:12.5px;cursor:pointer;color:#65676b;border-bottom:2px solid transparent;margin-bottom:-1px;font-weight:500;}
+    .tab:hover{color:#1A3ECA;}
+    .tab.active{color:#1A3ECA;border-bottom-color:#1A3ECA;font-weight:700;}
+
+    .tab-content{display:none;}
+    .tab-content.active{display:block;}
+
+    /* ── REGIONAL BREAKDOWN ── */
+    .subtabs-bar{display:flex;gap:8px;padding:10px 0;margin-bottom:10px;}
+    .subtab{padding:4px 14px;border-radius:16px;font-size:12px;cursor:pointer;font-weight:500;color:#65676b;border:1px solid #e8eaed;background:#fff;}
+    .subtab.active{background:#1A3ECA;color:#fff;border-color:#1A3ECA;font-weight:700;}
+
+    .regional-narrative{font-size:12.5px;color:#444;line-height:1.65;margin-bottom:14px;padding:10px 14px;background:#fafbfc;border:1px solid #e8eaed;border-radius:6px;}
+
+    .region-card{border:1px solid #e8eaed;border-radius:6px;margin-bottom:8px;overflow:hidden;}
+    .region-card-header{padding:10px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;background:#fff;}
+    .region-card-header:hover{background:#fafbfc;}
+    .region-name{font-size:13.5px;font-weight:700;}
+    .region-meta{font-size:11.5px;color:#8a8d91;margin-top:2px;}
+    .region-chevron{font-size:11px;color:#8a8d91;}
+    .region-body{padding:12px 14px;border-top:1px solid #e8eaed;background:#fafbfc;display:none;}
+    .region-body.open{display:block;}
+    .region-detail-row{display:flex;gap:24px;margin-bottom:8px;}
+    .rd-item .rd-val{font-size:15px;font-weight:800;color:#1A3ECA;}
+    .rd-item .rd-label{font-size:11px;color:#8a8d91;margin-top:1px;}
+
+    /* ── RRC FLOW ── */
+    .rrc-intro{font-size:12.5px;color:#444;line-height:1.65;margin-bottom:12px;padding:10px 14px;background:#fafbfc;border:1px solid #e8eaed;border-radius:6px;}
+    table.rrc-table{width:100%;border-collapse:collapse;font-size:12px;}
+    .rrc-table th{text-align:left;padding:7px 12px;background:#f8f9fb;font-size:11px;font-weight:700;color:#8a8d91;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid #e8eaed;}
+    .rrc-table td{padding:8px 12px;border-bottom:1px solid #f0f2f5;}
+    .rrc-table tr:hover td{background:#fafbfc;}
+    .rrc-pct{font-weight:700;color:#1A3ECA;}
+    .bar-wrap{background:#e8eaed;border-radius:4px;height:5px;width:80px;display:inline-block;vertical-align:middle;margin-left:8px;}
+    .bar-fill{height:5px;border-radius:4px;display:block;}
+
+    /* ── INTAKE TRENDS ── */
+    .trends-intro{font-size:12.5px;color:#444;line-height:1.65;margin-bottom:12px;padding:10px 14px;background:#fafbfc;border:1px solid #e8eaed;border-radius:6px;}
+    .trends-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
+    .trend-card{border:1px solid #e8eaed;border-radius:6px;padding:12px 14px;background:#fff;}
+    .trend-num{font-size:22px;font-weight:800;color:#1A3ECA;letter-spacing:-.03em;}
+    .trend-label{font-size:11.5px;color:#65676b;margin-top:2px;}
+    .trend-sub{font-size:11px;color:#8a8d91;margin-top:4px;}
+    table.trends-table{width:100%;border-collapse:collapse;font-size:12.5px;border:1px solid #e8eaed;border-radius:6px;overflow:hidden;}
+    .trends-table th{text-align:left;padding:8px 14px;background:#f8f9fb;font-size:11.5px;font-weight:600;color:#65676b;border-bottom:1px solid #e8eaed;}
+    .trends-table td{padding:8px 14px;border-bottom:1px solid #f0f2f5;}
+    .trends-table tr:last-child td{border-bottom:none;}
+
+    /* ── TOUR CURSOR ── */
+    #tc{position:fixed;width:20px;height:20px;border-radius:50%;background:rgba(26,62,202,.18);border:2px solid #1A3ECA;transform:translate(-50%,-50%);pointer-events:none;z-index:9999;opacity:0;transition:left .55s cubic-bezier(.4,0,.2,1),top .55s cubic-bezier(.4,0,.2,1),opacity .3s;}
+    #tc.ck{background:rgba(26,62,202,.38);transform:translate(-50%,-50%) scale(.65);transition:transform .15s,background .15s;}
+    .tcr{position:absolute;inset:-7px;border-radius:50%;border:1.5px solid rgba(26,62,202,.3);animation:tr 1.4s ease infinite;}
+    @keyframes tr{0%{transform:scale(.7);opacity:.9}100%{transform:scale(1.9);opacity:0}}
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="app-logo">
+    <div class="app-icon">I</div>
+    <div class="app-name">Integrity Regulatory<br>Control Center</div>
+  </div>
+
+  <div class="test-banner">⚠ You're in TEST</div>
+
+  <div class="nav-group">
+    <div class="nav-group-label">WAM <span class="chevron">^</span></div>
+    <div class="nav-item active">Admin Dashboard <span class="nav-dot"></span></div>
+    <div class="nav-item">Legal Obligations</div>
+    <div class="nav-item">Requirements</div>
+    <div class="nav-item">Tracks</div>
+    <div class="nav-item">Surfaces</div>
+    <div class="nav-item">Legal Pod Questions</div>
+    <div class="nav-item">Regulatory Context Search</div>
+    <div class="nav-item">Strategic Position Review</div>
+    <div class="nav-item">Policy Papers</div>
+    <div class="nav-item">Messaging</div>
+  </div>
+
+  <div class="nav-section-divider"></div>
+  <div class="nav-collapsed-group"><span><span class="g-icon">▦</span>IRCC</span> <span>▾</span></div>
+  <div class="nav-collapsed-group"><span><span class="g-icon">◎</span>Control Risk Workflow</span> <span>▾</span></div>
+  <div class="nav-collapsed-group"><span><span class="g-icon">↗</span>IRC Escalation Hub</span> <span>▾</span></div>
+
+  <div class="sidebar-footer">
+    <div class="sf-icon">◎</div>
+    <div class="sf-icon">?</div>
+    <div class="sf-icon">👤</div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="page-header">
+    <div class="page-title">
+      Admin Dashboard
+      <span class="halves-pill">All halves ▾</span>
+    </div>
+    <button class="btn-hpm">Copy as HPM Summary</button>
+  </div>
+
+  <div class="page-body">
+
+    <!-- TLDR -->
+    <div class="tldr-block">
+      <div class="tldr-period">
+        <span class="tldr-period-badge">H1 2026</span>
+        Updated Jun 27, 2026
+      </div>
+      <div class="tldr-label">TLDR</div>
+      <div class="tldr-text">Program is accelerating — 88% of P0 obligations on track, clearance up 142% over 5 months, with legal review throughput as the primary constraint heading into H2.</div>
+      <div class="exec-divider"></div>
+      <div class="exec-label">Executive Summary</div>
+      <div class="exec-grid">
+        <div class="exec-item"><div class="exec-val">156</div><div class="exec-desc">Total obligations active</div></div>
+        <div class="exec-item"><div class="exec-val">1,204</div><div class="exec-desc">Requirements in scope</div></div>
+        <div class="exec-item"><div class="exec-val">40</div><div class="exec-desc">Prioritized — 18 P0 · 14 P1 · 8 P2</div></div>
+        <div class="exec-item"><div class="exec-val">34%</div><div class="exec-desc">Pending IRC Legal review</div></div>
+        <div class="exec-item"><div class="exec-val">14</div><div class="exec-desc">Past enforcement deadline</div></div>
+        <div class="exec-item"><div class="exec-val">6</div><div class="exec-desc">Due within 14 days</div></div>
+      </div>
+      <div class="tldr-note">All metrics exclude archived obligations and their requirements.</div>
+    </div>
+
+    <!-- IN FOCUS -->
+    <div class="section-title">In Focus</div>
+    <div class="in-focus-card">
+      <table class="if-table">
+        <thead>
+          <tr>
+            <th>Priority</th>
+            <th>Obligations</th>
+            <th>Requirements</th>
+            <th>Completed (Monitor)</th>
+            <th>Pending</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="p-badge p0">P0</span></td>
+            <td><span class="link-num">18</span></td>
+            <td>284</td>
+            <td>1</td>
+            <td>17</td>
+          </tr>
+          <tr>
+            <td><span class="p-badge p1">P1</span></td>
+            <td><span class="link-num">14</span></td>
+            <td>108</td>
+            <td>2</td>
+            <td>12</td>
+          </tr>
+          <tr>
+            <td><span class="p-badge p2">P2</span></td>
+            <td><span class="link-num">8</span></td>
+            <td>312</td>
+            <td>0</td>
+            <td>8</td>
+          </tr>
+          <tr style="background:#f8f9fb;">
+            <td><strong>Total</strong></td>
+            <td><strong>40</strong></td>
+            <td><strong>704</strong></td>
+            <td><strong>3</strong></td>
+            <td><strong>37</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- INTAKE VOLUME -->
+    <div class="section-title">Intake Volume</div>
+    <div class="intake-card">
+      <div class="intake-sub">New obligations moved from INCOMING to WATCH/ACTION</div>
+      <table class="iv-table">
+        <thead>
+          <tr><th>Period</th><th>New Obligations</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>This Week (Jun 16 – Jun 22)</td><td class="iv-val">0</td></tr>
+          <tr><td>This Month (Jun 2026)</td><td class="iv-val">3</td></tr>
+          <tr><td>This Half (H1 2026)</td><td class="iv-val">24</td></tr>
+          <tr><td>This Year (2026)</td><td class="iv-val">24</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs-bar">
+      <div class="tab active" data-tab="regional">Regional Breakdown</div>
+      <div class="tab" data-tab="rrc">RRC Flow</div>
+      <div class="tab" data-tab="trends">Intake Trends</div>
+    </div>
+
+    <!-- REGIONAL BREAKDOWN -->
+    <div class="tab-content active" id="tab-regional">
+      <div class="subtabs-bar">
+        <div class="subtab active">All Obligations</div>
+        <div class="subtab">P0 Only</div>
+      </div>
+      <div class="regional-narrative">
+        IRC is currently tracking 156 obligations across 4 regions, encompassing 1,204 requirements with a 58% completion rate. APAC carries the largest share at 40% of the portfolio (63 obligations), with intake slowing (2 new in Jun vs 5 in May). 9 requirements are flagged At Risk, concentrated in APAC (5), NORAM (3), and LATAM (1). 24 requirements need clarification before execution can proceed.
+      </div>
+
+      <div class="region-card" id="card-apac">
+        <div class="region-card-header" onclick="toggleRegion('apac')">
+          <div>
+            <div class="region-name">APAC</div>
+            <div class="region-meta">63 obligations · 498 reqs · 5 At Risk · 44 completed</div>
+          </div>
+          <div class="region-chevron" id="chev-apac">▾</div>
+        </div>
+        <div class="region-body" id="body-apac">
+          <div class="region-detail-row">
+            <div class="rd-item"><div class="rd-val">63</div><div class="rd-label">Total obligations</div></div>
+            <div class="rd-item"><div class="rd-val">498</div><div class="rd-label">Requirements</div></div>
+            <div class="rd-item"><div class="rd-val" style="color:#d97706;">5</div><div class="rd-label">At Risk</div></div>
+            <div class="rd-item"><div class="rd-val" style="color:#16a34a;">44</div><div class="rd-label">Completed</div></div>
+          </div>
+          <div style="font-size:12px;color:#65676b;line-height:1.55;">Largest region by obligation volume. Data localization legislation driving elevated intake. Two P0 items require legal sign-off within 14 days.</div>
+        </div>
+      </div>
+
+      <div class="region-card" id="card-emea">
+        <div class="region-card-header" onclick="toggleRegion('emea')">
+          <div>
+            <div class="region-name">EMEA</div>
+            <div class="region-meta">42 obligations · 331 reqs · 2 At Risk · 38 completed</div>
+          </div>
+          <div class="region-chevron" id="chev-emea">▾</div>
+        </div>
+        <div class="region-body" id="body-emea">
+          <div class="region-detail-row">
+            <div class="rd-item"><div class="rd-val">42</div><div class="rd-label">Total obligations</div></div>
+            <div class="rd-item"><div class="rd-val">331</div><div class="rd-label">Requirements</div></div>
+            <div class="rd-item"><div class="rd-val" style="color:#d97706;">2</div><div class="rd-label">At Risk</div></div>
+            <div class="rd-item"><div class="rd-val" style="color:#16a34a;">38</div><div class="rd-label">Completed</div></div>
+          </div>
+          <div style="font-size:12px;color:#65676b;line-height:1.55;">DMA gatekeeper designation backlog resolved this cycle. Completion rate improved to 91%. Remaining at-risk items concentrated in advertising policy obligations.</div>
+        </div>
+      </div>
+
+      <div class="region-card">
+        <div class="region-card-header">
+          <div>
+            <div class="region-name">LATAM</div>
+            <div class="region-meta">29 obligations · 218 reqs · 1 At Risk · 24 completed</div>
+          </div>
+          <div class="region-chevron">▾</div>
+        </div>
+      </div>
+
+      <div class="region-card">
+        <div class="region-card-header">
+          <div>
+            <div class="region-name">NORAM</div>
+            <div class="region-meta">22 obligations · 157 reqs · 3 At Risk · 18 completed</div>
+          </div>
+          <div class="region-chevron">▾</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RRC FLOW -->
+    <div class="tab-content" id="tab-rrc">
+      <div style="padding:10px 0;">
+        <div class="rrc-intro">
+          RRC (Regulatory Readiness Completion) Flow tracks how thoroughly each obligation has been scoped, documented, and prepared for execution. Obligations below 80% RRC are flagged for follow-up. Surface owners are responsible for completing RRC documentation within 30 days of obligation creation.
+        </div>
+        <table class="rrc-table">
+          <thead>
+            <tr>
+              <th>Track / Surface</th>
+              <th>Obligations</th>
+              <th>Avg. RRC Score</th>
+              <th>Below 80%</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Regulatory Compliance Core</td>
+              <td>18</td>
+              <td><span class="rrc-pct">96%</span><span class="bar-wrap"><span class="bar-fill" style="width:96%;background:#16a34a;"></span></span></td>
+              <td style="color:#16a34a;font-weight:700;">0</td>
+              <td><span style="background:#dcfce7;color:#16a34a;padding:2px 8px;border-radius:10px;font-size:11.5px;font-weight:600;">On Track</span></td>
+            </tr>
+            <tr>
+              <td>EMEA Policy Enforcement</td>
+              <td>12</td>
+              <td><span class="rrc-pct">88%</span><span class="bar-wrap"><span class="bar-fill" style="width:88%;background:#22c55e;"></span></span></td>
+              <td style="color:#16a34a;font-weight:700;">1</td>
+              <td><span style="background:#dcfce7;color:#16a34a;padding:2px 8px;border-radius:10px;font-size:11.5px;font-weight:600;">On Track</span></td>
+            </tr>
+            <tr>
+              <td>APAC Data Localization</td>
+              <td>21</td>
+              <td><span class="rrc-pct">72%</span><span class="bar-wrap"><span class="bar-fill" style="width:72%;background:#f59e0b;"></span></span></td>
+              <td style="color:#d97706;font-weight:700;">4</td>
+              <td><span style="background:#fef3c7;color:#d97706;padding:2px 8px;border-radius:10px;font-size:11.5px;font-weight:600;">At Risk</span></td>
+            </tr>
+            <tr>
+              <td>Enforcement Response</td>
+              <td>9</td>
+              <td><span class="rrc-pct">81%</span><span class="bar-wrap"><span class="bar-fill" style="width:81%;background:#22c55e;"></span></span></td>
+              <td style="color:#16a34a;font-weight:700;">1</td>
+              <td><span style="background:#dcfce7;color:#16a34a;padding:2px 8px;border-radius:10px;font-size:11.5px;font-weight:600;">On Track</span></td>
+            </tr>
+            <tr>
+              <td>LATAM Regulatory Response</td>
+              <td>14</td>
+              <td><span class="rrc-pct">65%</span><span class="bar-wrap"><span class="bar-fill" style="width:65%;background:#ef4444;"></span></span></td>
+              <td style="color:#dc2626;font-weight:700;">6</td>
+              <td><span style="background:#fee2e2;color:#dc2626;padding:2px 8px;border-radius:10px;font-size:11.5px;font-weight:600;">Needs Attention</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- INTAKE TRENDS -->
+    <div class="tab-content" id="tab-trends">
+      <div style="padding:10px 0;">
+        <div class="trends-intro">
+          Intake volume reflects obligations newly moved from INCOMING to WATCH/ACTION status. H1 2026 intake is tracking 8% above H1 2025, driven primarily by APAC legislative activity and new EMEA enforcement actions.
+        </div>
+        <div class="trends-grid">
+          <div class="trend-card"><div class="trend-num">24</div><div class="trend-label">H1 2026 intake</div><div class="trend-sub">↑ 8% vs H1 2025</div></div>
+          <div class="trend-card"><div class="trend-num">1.4d</div><div class="trend-label">Avg. time to triage</div><div class="trend-sub">↓ 0.6d from last half</div></div>
+          <div class="trend-card"><div class="trend-num">58%</div><div class="trend-label">Overall completion rate</div><div class="trend-sub">↑ 4pp from H1 2025</div></div>
+        </div>
+        <table class="trends-table">
+          <thead>
+            <tr><th>Month</th><th>New Obligations</th><th>APAC</th><th>EMEA</th><th>LATAM</th><th>NORAM</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>January 2026</td><td>3</td><td>2</td><td>1</td><td>0</td><td>0</td></tr>
+            <tr><td>February 2026</td><td>2</td><td>1</td><td>0</td><td>0</td><td>1</td></tr>
+            <tr><td>March 2026</td><td>5</td><td>2</td><td>1</td><td>1</td><td>1</td></tr>
+            <tr><td>April 2026</td><td>6</td><td>3</td><td>1</td><td>1</td><td>1</td></tr>
+            <tr><td>May 2026</td><td>5</td><td>2</td><td>2</td><td>0</td><td>1</td></tr>
+            <tr><td>June 2026 (MTD)</td><td>3</td><td>1</td><td>1</td><td>0</td><td>1</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /page-body -->
+</div><!-- /main -->
+
+<!-- Disclaimer -->
+<div style="position:fixed;bottom:0;left:0;right:0;padding:4px 14px;background:rgba(248,249,251,0.96);border-top:1px solid #e0e2e6;font-size:10px;color:#8a8d91;z-index:500;text-align:center;letter-spacing:.01em;">
+  Illustrative mockup — all names, data, and content are entirely fictional. No proprietary or confidential information is depicted.
+</div>
+
+<!-- Tour cursor -->
+<div id="tc"><div class="tcr"></div></div>
+
+<script>
+  // ── TAB SWITCHING ──
+  const tabs = document.querySelectorAll('.tab');
+  const tabContents = document.querySelectorAll('.tab-content');
+
+  function switchTab(name) {
+    tabs.forEach(t => t.classList.remove('active'));
+    tabContents.forEach(c => c.classList.remove('active'));
+    const tab = document.querySelector(`.tab[data-tab="${name}"]`);
+    const content = document.getElementById('tab-' + name);
+    if (tab) tab.classList.add('active');
+    if (content) content.classList.add('active');
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+  });
+
+  // sub-tab toggle (cosmetic)
+  document.querySelectorAll('.subtab').forEach(st => {
+    st.addEventListener('click', function() {
+      this.closest('.subtabs-bar').querySelectorAll('.subtab').forEach(x => x.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  // ── REGION CARD TOGGLE ──
+  function toggleRegion(id) {
+    const body = document.getElementById('body-' + id);
+    const chev = document.getElementById('chev-' + id);
+    if (!body) return;
+    const open = body.classList.toggle('open');
+    if (chev) chev.textContent = open ? '▴' : '▾';
+  }
+
+  // ── ANIMATED TOUR ── (cycles through tabs + expands APAC)
+  const tourSeq = [
+    {type:'tab', name:'rrc'},
+    {type:'tab', name:'trends'},
+    {type:'tab', name:'regional'},
+    {type:'region', name:'apac'},
+  ];
+  let idx = 0, alive = true, t;
+  const cur = document.getElementById('tc');
+
+  function getTabEl(name) { return document.querySelector(`.tab[data-tab="${name}"]`); }
+  function getRegionHeader(id) { return document.querySelector(`#card-${id} .region-card-header`); }
+
+  function tourStep() {
+    if (!alive) return;
+    const step = tourSeq[idx % tourSeq.length];
+    let el = step.type === 'tab' ? getTabEl(step.name) : getRegionHeader(step.name);
+    if (!el) { idx++; t = setTimeout(tourStep, 2800); return; }
+
+    const r = el.getBoundingClientRect();
+    cur.style.left = (r.left + r.width / 2) + 'px';
+    cur.style.top  = (r.top + r.height / 2) + 'px';
+    cur.style.opacity = '1';
+
+    setTimeout(() => {
+      if (!alive) return;
+      cur.classList.add('ck');
+      setTimeout(() => {
+        if (!alive) return;
+        cur.classList.remove('ck');
+        if (step.type === 'tab') switchTab(step.name);
+        else if (step.type === 'region') toggleRegion(step.name);
+        idx++;
+        t = setTimeout(tourStep, 2800);
+      }, 220);
+    }, 700);
+  }
+
+  const ts = setTimeout(tourStep, 2000);
+  function stopTour() { alive=false; clearTimeout(t); clearTimeout(ts); cur.style.opacity='0'; }
+  document.addEventListener('click', stopTour, {once:true});
+</script>
+</body>
+</html>

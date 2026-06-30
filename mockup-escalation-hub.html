@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IRC Escalation Hub</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#fff;font-size:13.5px;color:#1c1e21;display:flex;height:100vh;overflow:hidden;}
+
+    /* ── SIDEBAR ── */
+    .sidebar{width:192px;background:#f0f2f5;border-right:1px solid #dde0e4;display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
+    .sidebar-logo{padding:13px 14px;border-bottom:1px solid #dde0e4;display:flex;align-items:center;gap:9px;flex-shrink:0;}
+    .logo-icon{width:28px;height:28px;background:#1A3ECA;border-radius:6px;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:9px;flex-shrink:0;}
+    .logo-text{font-weight:700;font-size:13.5px;letter-spacing:-.01em;line-height:1.2;}
+    .logo-sub{font-size:10px;color:#65676b;font-weight:400;}
+    .nav-section{padding:10px 8px 2px;}
+    .nav-label{font-size:10px;font-weight:700;color:#8a8d91;text-transform:uppercase;letter-spacing:.1em;padding:0 6px;margin-bottom:3px;}
+    .nav-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;color:#1c1e21;font-size:12.5px;cursor:pointer;margin-bottom:1px;}
+    .nav-item:hover{background:#e4e6e9;}
+    .nav-item.active{background:#dce8ff;color:#1A3ECA;font-weight:600;}
+    .nav-item .ni{font-size:12px;opacity:.6;width:14px;text-align:center;}
+    .nav-item.active .ni{opacity:1;}
+    .nav-dot{width:5px;height:5px;border-radius:50%;background:#1A3ECA;margin-left:auto;flex-shrink:0;opacity:.55;animation:dp 2.5s ease infinite;}
+    @keyframes dp{0%,100%{opacity:.55;transform:scale(1)}50%{opacity:.15;transform:scale(.65)}}
+
+    /* ── MAIN ── */
+    .main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+    .view{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+    .view.hidden{display:none;}
+
+    /* ── HOME VIEW ── */
+    .home-header{padding:18px 22px 14px;border-bottom:1px solid #e8eaed;background:#fff;}
+    .home-title{font-size:17px;font-weight:700;letter-spacing:-.02em;}
+    .home-desc{font-size:12px;color:#65676b;margin-top:5px;max-width:520px;line-height:1.55;}
+    .home-body{flex:1;overflow-y:auto;padding:18px 22px;}
+
+    .flow-row{display:flex;gap:0;margin-bottom:20px;}
+    .flow-step{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;padding:14px 8px;background:#fff;border:1px solid #e8eaed;position:relative;}
+    .flow-step:not(:last-child)::after{content:'→';position:absolute;right:-10px;top:50%;transform:translateY(-50%);color:#bcc0c4;font-size:14px;z-index:1;}
+    .flow-step:first-child{border-radius:8px 0 0 8px;}
+    .flow-step:last-child{border-radius:0 8px 8px 0;}
+    .flow-num{width:26px;height:26px;border-radius:50%;background:#1A3ECA;color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;margin-bottom:7px;}
+    .flow-label{font-size:11.5px;font-weight:600;color:#1c1e21;margin-bottom:2px;}
+    .flow-sub{font-size:10.5px;color:#8a8d91;line-height:1.4;}
+
+    .routing-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+    .routing-card{background:#fff;border:1px solid #e8eaed;border-radius:8px;padding:14px 16px;}
+    .routing-card.l1{border-top:3px solid #1A3ECA;}
+    .routing-card.l2{border-top:3px solid #6366f1;}
+    .routing-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:12px;font-size:11px;font-weight:700;letter-spacing:.04em;margin-bottom:8px;}
+    .routing-badge.l1{background:#dce8ff;color:#1A3ECA;}
+    .routing-badge.l2{background:#ede9fe;color:#6366f1;}
+    .routing-name{font-size:13px;font-weight:700;margin-bottom:5px;}
+    .routing-desc{font-size:12px;color:#65676b;line-height:1.5;}
+    .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+    .stat-box{background:#fff;border:1px solid #e8eaed;border-radius:8px;padding:13px 16px;}
+    .stat-num{font-size:22px;font-weight:800;color:#1A3ECA;letter-spacing:-.03em;}
+    .stat-label{font-size:11.5px;color:#65676b;margin-top:2px;line-height:1.3;}
+
+    /* ── SUBMIT VIEW ── */
+    .submit-header{padding:16px 22px 12px;border-bottom:1px solid #e8eaed;flex-shrink:0;}
+    .submit-title{font-size:16px;font-weight:700;letter-spacing:-.02em;}
+    .submit-progress-bar{background:#e8eaed;border-radius:2px;height:4px;margin-top:10px;}
+    .submit-progress-fill{background:#1A3ECA;border-radius:2px;height:4px;width:14%;}
+    .submit-progress-label{font-size:11px;color:#8a8d91;margin-top:4px;}
+    .submit-body{flex:1;display:flex;overflow:hidden;}
+    .wizard-steps{width:152px;border-right:1px solid #e8eaed;padding:16px 12px;background:#fafbfc;flex-shrink:0;overflow-y:auto;}
+    .wiz-step{display:flex;align-items:flex-start;gap:9px;margin-bottom:14px;}
+    .wiz-dot{width:18px;height:18px;border-radius:50%;border:2px solid #ccd0d5;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-weight:700;color:#ccd0d5;margin-top:1px;}
+    .wiz-dot.active{background:#1A3ECA;border-color:#1A3ECA;color:#fff;}
+    .wiz-label{font-size:12px;color:#8a8d91;line-height:1.3;}
+    .wiz-label.active{color:#1A3ECA;font-weight:700;}
+    .submit-form{flex:1;padding:18px 22px;overflow-y:auto;}
+    .form-section{margin-bottom:18px;}
+    .form-section-title{font-size:13px;font-weight:700;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #e8eaed;}
+    .field{margin-bottom:12px;}
+    .field-label{display:block;font-size:12px;font-weight:600;margin-bottom:4px;}
+    .field-hint{font-size:11px;color:#8a8d91;margin-bottom:5px;}
+    .field-input{width:100%;border:1px solid #ccd0d5;border-radius:6px;padding:7px 10px;font-size:12.5px;background:#fafbfc;font-family:inherit;color:#1c1e21;}
+    .field-select{width:100%;border:1px solid #ccd0d5;border-radius:6px;padding:7px 10px;font-size:12.5px;background:#fafbfc;font-family:inherit;color:#1c1e21;}
+    .field-textarea{width:100%;border:1px solid #ccd0d5;border-radius:6px;padding:7px 10px;font-size:12.5px;background:#fafbfc;height:90px;resize:none;font-family:inherit;color:#1c1e21;line-height:1.5;}
+    .ai-refine{font-size:11.5px;color:#1A3ECA;cursor:pointer;margin-top:4px;display:inline-flex;align-items:center;gap:4px;}
+    .char-count{font-size:11px;color:#8a8d91;text-align:right;margin-top:3px;}
+    .wiz-footer{padding:12px 22px;border-top:1px solid #e8eaed;display:flex;justify-content:space-between;align-items:center;background:#fafbfc;flex-shrink:0;}
+    .btn-back{font-size:12.5px;color:#65676b;background:none;border:1px solid #ccd0d5;border-radius:6px;padding:6px 16px;cursor:pointer;font-family:inherit;}
+    .btn-next{background:#1A3ECA;color:#fff;border:none;border-radius:6px;padding:6px 18px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;}
+
+    /* ── GUIDE VIEW ── */
+    .guide-body{flex:1;overflow-y:auto;padding:20px 24px;}
+    .guide-step{display:flex;gap:14px;margin-bottom:22px;}
+    .guide-num{width:28px;height:28px;border-radius:50%;background:#1A3ECA;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+    .guide-title{font-size:13.5px;font-weight:700;margin-bottom:5px;}
+    .guide-desc{font-size:12.5px;color:#65676b;line-height:1.55;}
+    .routing-decision-box{background:#f8f9ff;border:1px solid #c7d2fe;border-radius:8px;padding:14px 16px;margin-top:18px;}
+    .routing-decision-title{font-size:12px;font-weight:700;color:#3730a3;margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em;}
+    .routing-cards-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+    /* ── REVIEW QUEUE VIEW ── */
+    .queue-header{padding:16px 22px 12px;border-bottom:1px solid #e8eaed;flex-shrink:0;}
+    .queue-title{font-size:16px;font-weight:700;letter-spacing:-.02em;}
+    .queue-desc{font-size:12px;color:#65676b;margin-top:4px;}
+    .queue-body{flex:1;overflow-y:auto;padding:14px 22px;}
+    .queue-search input{width:100%;border:1px solid #ccd0d5;border-radius:6px;padding:7px 12px;font-size:12.5px;background:#fafbfc;font-family:inherit;color:#1c1e21;margin-bottom:14px;}
+    .queue-section-hd{font-size:12px;font-weight:700;color:#65676b;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+    .queue-count{background:#e8eaed;color:#65676b;border-radius:10px;padding:1px 8px;font-size:11px;}
+    table.q-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:20px;}
+    .q-table th{text-align:left;padding:7px 10px;background:#f3f4f6;font-size:11px;font-weight:700;color:#8a8d91;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid #e8eaed;}
+    .q-table td{padding:8px 10px;border-bottom:1px solid #f0f2f5;vertical-align:middle;}
+    .q-table tr:hover td{background:#fafbfc;}
+    .q-topic{font-weight:600;color:#1c1e21;}
+    .q-sub{font-size:11px;color:#8a8d91;margin-top:1px;}
+    .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10.5px;font-weight:700;}
+    .badge-high{background:#fee2e2;color:#dc2626;}
+    .badge-med{background:#fef3c7;color:#d97706;}
+    .status-pill{display:inline-block;padding:2px 9px;border-radius:10px;font-size:11px;font-weight:600;}
+    .s-review{background:#dce8ff;color:#1A3ECA;}
+    .s-monitor{background:#fef3c7;color:#d97706;}
+    .s-approved{background:#dcfce7;color:#16a34a;}
+    .q-actions a{color:#1A3ECA;font-size:11.5px;cursor:pointer;margin-right:8px;}
+
+    /* ── FEEDBACK VIEW ── */
+    .fb-header{padding:16px 22px 12px;border-bottom:1px solid #e8eaed;flex-shrink:0;}
+    .fb-title{font-size:16px;font-weight:700;letter-spacing:-.02em;}
+    .fb-desc{font-size:12px;color:#65676b;margin-top:4px;}
+    .fb-body{flex:1;overflow-y:auto;padding:18px 22px;}
+    .fb-type-row{display:flex;gap:10px;margin-bottom:16px;}
+    .fb-type{padding:8px 18px;border-radius:6px;border:1px solid #ccd0d5;font-size:13px;font-weight:600;cursor:pointer;color:#65676b;}
+    .fb-type.active{background:#dce8ff;border-color:#1A3ECA;color:#1A3ECA;}
+    .fb-form{background:#fff;border:1px solid #e8eaed;border-radius:8px;padding:18px;}
+    .fb-footer{display:flex;justify-content:flex-end;margin-top:14px;}
+    .btn-submit{background:#1A3ECA;color:#fff;border:none;border-radius:6px;padding:8px 22px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+
+    /* ── AI FAB + POPUP ── */
+    .ai-fab{position:fixed;bottom:28px;right:18px;width:42px;height:42px;border-radius:50%;background:#1A3ECA;color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;box-shadow:0 4px 16px rgba(26,62,202,.38);z-index:200;transition:transform .15s,box-shadow .15s;}
+    .ai-fab:hover{transform:scale(1.08);box-shadow:0 6px 20px rgba(26,62,202,.45);}
+
+    .ai-popup{position:fixed;bottom:80px;right:18px;width:296px;background:#fff;border:1px solid #e0e2e6;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.14);z-index:199;display:none;flex-direction:column;overflow:hidden;max-height:370px;}
+    .ai-popup.open{display:flex;}
+    .ai-popup-header{background:#f0f4ff;padding:12px 14px 10px;border-bottom:1px solid #dce8ff;display:flex;align-items:flex-start;justify-content:space-between;}
+    .ai-popup-title{font-size:13.5px;font-weight:800;color:#1A3ECA;margin-bottom:2px;}
+    .ai-popup-sub{font-size:11.5px;color:#65676b;}
+    .ai-popup-close{color:#8a8d91;cursor:pointer;font-size:15px;line-height:1;padding:2px;}
+    .ai-suggestions{padding:8px 12px;border-bottom:1px solid #e8eaed;}
+    .ai-suggestion{background:#f0f4ff;border-radius:6px;padding:7px 10px;font-size:11.5px;color:#1A3ECA;cursor:pointer;margin-bottom:5px;line-height:1.4;}
+    .ai-suggestion:hover{background:#dce8ff;}
+    .ai-suggestion:last-child{margin-bottom:0;}
+    .ai-chat-area{flex:1;overflow-y:auto;padding:10px 12px;}
+    .ai-chat-msg{padding:8px 10px;border-radius:6px;font-size:12px;line-height:1.5;margin-bottom:7px;}
+    .ai-chat-msg.bot{background:#f0f4ff;color:#1c1e21;}
+    .ai-chat-msg.user{background:#dce8ff;color:#1A3ECA;text-align:right;}
+    .ai-input-row{padding:9px 12px;border-top:1px solid #e8eaed;display:flex;gap:6px;}
+    .ai-input-field{flex:1;border:1px solid #ccd0d5;border-radius:6px;padding:6px 10px;font-size:12px;font-family:inherit;}
+    .ai-send-btn{background:#1A3ECA;color:#fff;border:none;border-radius:6px;width:28px;font-size:14px;cursor:pointer;flex-shrink:0;}
+
+    /* ── TOUR CURSOR ── */
+    #tc{position:fixed;width:22px;height:22px;border-radius:50%;background:rgba(26,62,202,.18);border:2px solid #1A3ECA;transform:translate(-50%,-50%);pointer-events:none;z-index:9999;opacity:0;transition:left .55s cubic-bezier(.4,0,.2,1),top .55s cubic-bezier(.4,0,.2,1),opacity .3s;}
+    #tc.ck{background:rgba(26,62,202,.38);transform:translate(-50%,-50%) scale(.65);transition:transform .15s,background .15s;}
+    .tcr{position:absolute;inset:-7px;border-radius:50%;border:1.5px solid rgba(26,62,202,.3);animation:tr 1.4s ease infinite;}
+    @keyframes tr{0%{transform:scale(.7);opacity:.9}100%{transform:scale(1.9);opacity:0}}
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">IRC</div>
+    <div>
+      <div class="logo-text">Escalation Hub</div>
+      <div class="logo-sub">Integrity Risk &amp; Compliance</div>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Main</div>
+    <div class="nav-item active" data-view="home"><span class="ni">⌂</span> Home <span class="nav-dot"></span></div>
+    <div class="nav-item" data-view="none"><span class="ni">☰</span> About Us</div>
+    <div class="nav-item" data-view="none"><span class="ni">◈</span> IWAM</div>
+    <div class="nav-item" data-view="feedback"><span class="ni">✦</span> Feedback <span class="nav-dot"></span></div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Escalations</div>
+    <div class="nav-item" data-view="submit"><span class="ni">⬆</span> Submit Escalation <span class="nav-dot"></span></div>
+    <div class="nav-item" data-view="none"><span class="ni">◎</span> My Submissions</div>
+    <div class="nav-item" data-view="none"><span class="ni">◫</span> Archive</div>
+    <div class="nav-item" data-view="none"><span class="ni">▦</span> Dashboard</div>
+    <div class="nav-item" data-view="guide"><span class="ni">☷</span> Escalation Guide <span class="nav-dot"></span></div>
+    <div class="nav-item" data-view="none"><span class="ni">◉</span> Attendees</div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Admin</div>
+    <div class="nav-item" data-view="review-queue"><span class="ni">◫</span> Review Queue <span class="nav-dot"></span></div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- HOME VIEW -->
+  <div class="view" id="view-home">
+    <div class="home-header">
+      <div class="home-title">IRC Escalation Hub</div>
+      <div class="home-desc">The single platform for managing high-stakes compliance decisions — from submission to searchable archive. 90+ decisions indexed. AI-powered precedent search.</div>
+    </div>
+    <div class="home-body">
+      <div class="flow-row">
+        <div class="flow-step"><div class="flow-num">1</div><div class="flow-label">Submit</div><div class="flow-sub">Structured intake via 7-section wizard</div></div>
+        <div class="flow-step"><div class="flow-num">2</div><div class="flow-label">Review</div><div class="flow-sub">Admin queue — L1 or L2 routing decision</div></div>
+        <div class="flow-step"><div class="flow-num">3</div><div class="flow-label">Prepare</div><div class="flow-sub">GChat space auto-created, deck auto-generated</div></div>
+        <div class="flow-step"><div class="flow-num">4</div><div class="flow-label">Decision</div><div class="flow-sub">Outcome recorded, archived, searchable</div></div>
+      </div>
+      <div class="routing-row">
+        <div class="routing-card l1">
+          <div class="routing-badge l1">⊙ L1 SteerCo</div>
+          <div class="routing-name">Executive Steering Committee</div>
+          <div class="routing-desc">Cross-functional decisions requiring VP-level alignment. Policy, legal, and product representation. Binding outcomes with full audit trail.</div>
+        </div>
+        <div class="routing-card l2">
+          <div class="routing-badge l2">◎ L2 Circle</div>
+          <div class="routing-name">Operational Working Group</div>
+          <div class="routing-desc">Complex issues needing cross-team coordination below SteerCo. Faster cadence, more frequent meetings, escalation path to L1 if unresolved.</div>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-box"><div class="stat-num">90+</div><div class="stat-label">Decisions archived &amp; searchable via AI</div></div>
+        <div class="stat-box"><div class="stat-num">&lt;24h</div><div class="stat-label">Avg. review-to-routing turnaround</div></div>
+        <div class="stat-box"><div class="stat-num">4 → 1</div><div class="stat-label">Systems consolidated into one platform</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUBMIT VIEW -->
+  <div class="view hidden" id="view-submit">
+    <div class="submit-header">
+      <div class="submit-title">Submit an Escalation Topic</div>
+      <div class="submit-progress-bar"><div class="submit-progress-fill"></div></div>
+      <div class="submit-progress-label">Progress: 1 of 7 sections complete</div>
+    </div>
+    <div class="submit-body">
+      <div class="wizard-steps">
+        <div class="wiz-step"><div class="wiz-dot active">1</div><div class="wiz-label active">Submitter</div></div>
+        <div class="wiz-step"><div class="wiz-dot">2</div><div class="wiz-label">Escalation</div></div>
+        <div class="wiz-step"><div class="wiz-dot">3</div><div class="wiz-label">Topic</div></div>
+        <div class="wiz-step"><div class="wiz-dot">4</div><div class="wiz-label">Risk</div></div>
+        <div class="wiz-step"><div class="wiz-dot">5</div><div class="wiz-label">Compliance</div></div>
+        <div class="wiz-step"><div class="wiz-dot">6</div><div class="wiz-label">Scheduling</div></div>
+        <div class="wiz-step"><div class="wiz-dot">7</div><div class="wiz-label">Acknowledge</div></div>
+      </div>
+      <div class="submit-form">
+        <div class="form-section">
+          <div class="form-section-title">Your Information</div>
+          <div class="field">
+            <label class="field-label">Full Name</label>
+            <input class="field-input" type="text" value="Alex Moreno" />
+          </div>
+          <div class="field">
+            <label class="field-label">Team / Org</label>
+            <select class="field-select"><option>Integrity Risk &amp; Compliance</option><option>Legal</option><option>Policy</option></select>
+          </div>
+        </div>
+        <div class="form-section">
+          <div class="form-section-title">Escalation Details</div>
+          <div class="field">
+            <label class="field-label">Preferred Channel</label>
+            <select class="field-select"><option>L1 SteerCo</option><option>L2 Circle</option><option>Not sure — needs routing decision</option></select>
+          </div>
+          <div class="field">
+            <label class="field-label">Topic Type</label>
+            <select class="field-select"><option>Regulatory &amp; Compliance</option><option>Policy Decision</option><option>Cross-Functional Unblock</option><option>Risk Escalation</option></select>
+          </div>
+        </div>
+        <div class="form-section">
+          <div class="form-section-title">Topic Information</div>
+          <div class="field">
+            <label class="field-label">Topic Title</label>
+            <input class="field-input" type="text" placeholder="Brief, descriptive title for the escalation topic" />
+          </div>
+          <div class="field">
+            <label class="field-label">Description</label>
+            <div class="field-hint">What's the issue, why does it need a decision, and what's the timeline pressure?</div>
+            <textarea class="field-textarea" placeholder="Describe the topic and what decision or alignment you need..."></textarea>
+            <div style="display:flex;justify-content:space-between;margin-top:4px;">
+              <span class="ai-refine">✦ Refine with AI</span>
+              <span class="char-count">0 / 30 words</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="wiz-footer">
+      <button class="btn-back">← Back</button>
+      <button class="btn-next">Save &amp; Continue →</button>
+    </div>
+  </div>
+
+  <!-- GUIDE VIEW -->
+  <div class="view hidden" id="view-guide">
+    <div class="home-header">
+      <div class="home-title">Escalation Guide</div>
+      <div class="home-desc">How the escalation process works — from submission through decision and archival.</div>
+    </div>
+    <div class="guide-body">
+      <div class="guide-step">
+        <div class="guide-num">1</div>
+        <div>
+          <div class="guide-title">Submit a Topic</div>
+          <div class="guide-desc">Use the 7-section submission form to document your escalation. Include context, risk level, stakeholders, and timeline constraints. The admin review queue is notified automatically on submission.</div>
+        </div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-num">2</div>
+        <div>
+          <div class="guide-title">Reviewed &amp; Accepted</div>
+          <div class="guide-desc">The IRC team reviews your submission within 24 hours and assigns it to L1 SteerCo or L2 Circle based on scope and complexity. A shared GChat space is created automatically with all stakeholders added.</div>
+        </div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-num">3</div>
+        <div>
+          <div class="guide-title">Preparation</div>
+          <div class="guide-desc">A structured preparation deck is auto-generated and shared in your escalation space. Stakeholders review and contribute before the meeting. Scheduled reminders go out 48h and 24h prior.</div>
+        </div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-num">4</div>
+        <div>
+          <div class="guide-title">Decision &amp; Archive</div>
+          <div class="guide-desc">After the meeting, the IRC team records the decision, rationale, and action items. The record is archived and indexed — queryable by topic, date, risk area, and stakeholder via the AI assistant.</div>
+        </div>
+      </div>
+      <div class="routing-decision-box">
+        <div class="routing-decision-title">Routing Decision Guide</div>
+        <div class="routing-cards-row">
+          <div class="routing-card l1" style="padding:12px;">
+            <div class="routing-badge l1" style="margin-bottom:6px;">L1 SteerCo</div>
+            <div style="font-size:11.5px;color:#65676b;line-height:1.5;">VP-level decisions · Policy precedent · Legal sign-off required · Cross-org alignment</div>
+          </div>
+          <div class="routing-card l2" style="padding:12px;">
+            <div class="routing-badge l2" style="margin-bottom:6px;">L2 Circle</div>
+            <div style="font-size:11.5px;color:#65676b;line-height:1.5;">Director-level decisions · Operational unblocks · Faster cadence · L1 escalation path</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REVIEW QUEUE VIEW -->
+  <div class="view hidden" id="view-review-queue">
+    <div class="queue-header">
+      <div class="queue-title">Review Queue</div>
+      <div class="queue-desc">Admin view — incoming escalation topics pending routing decision. Approved topics auto-create a GChat space with all stakeholders added.</div>
+    </div>
+    <div class="queue-body">
+      <div class="queue-search"><input placeholder="Search by title, submitter, ref ID, region, risk area..." /></div>
+
+      <div class="queue-section-hd">▾ Pending Review <span class="queue-count">4</span></div>
+      <table class="q-table">
+        <thead>
+          <tr>
+            <th>Topic</th>
+            <th>Submitted By</th>
+            <th>Proposed Forum</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="q-topic">Platform Policy Alignment – Emerging Content Category</div><div class="q-sub">Ref #ESC-0091 · Jun 20</div></td>
+            <td style="font-size:12px;white-space:nowrap;">D. Walsh</td>
+            <td><span class="badge" style="background:#dce8ff;color:#1A3ECA;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:10px;">L1 SteerCo</span></td>
+            <td><span class="badge badge-high">High</span></td>
+            <td><span class="status-pill s-review">Under Review</span></td>
+            <td class="q-actions"><a>Route</a><a>Decline</a></td>
+          </tr>
+          <tr>
+            <td><div class="q-topic">Cross-Regional Enforcement Gap – APAC Content Moderation</div><div class="q-sub">Ref #ESC-0090 · Jun 18</div></td>
+            <td style="font-size:12px;white-space:nowrap;">K. Ferrara</td>
+            <td><span class="badge" style="background:#ede9fe;color:#6366f1;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:10px;">L2 Circle</span></td>
+            <td><span class="badge badge-med">Medium</span></td>
+            <td><span class="status-pill s-monitor">Monitoring</span></td>
+            <td class="q-actions"><a>Route</a><a>Decline</a></td>
+          </tr>
+          <tr>
+            <td><div class="q-topic">Legal Sign-Off Needed: P0 Regulatory Obligation – NORAM</div><div class="q-sub">Ref #ESC-0089 · Jun 15</div></td>
+            <td style="font-size:12px;white-space:nowrap;">R. Stavros</td>
+            <td><span class="badge" style="background:#dce8ff;color:#1A3ECA;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:10px;">L1 SteerCo</span></td>
+            <td><span class="badge badge-high">High</span></td>
+            <td><span class="status-pill s-review">Under Review</span></td>
+            <td class="q-actions"><a>Route</a><a>Decline</a></td>
+          </tr>
+          <tr>
+            <td><div class="q-topic">Ads Policy Update: Youth Privacy Scope Expansion</div><div class="q-sub">Ref #ESC-0088 · Jun 12</div></td>
+            <td style="font-size:12px;white-space:nowrap;">L. Harmon</td>
+            <td><span class="badge" style="background:#ede9fe;color:#6366f1;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:10px;">L2 Circle</span></td>
+            <td><span class="badge badge-med">Medium</span></td>
+            <td><span class="status-pill s-approved">Approved</span></td>
+            <td class="q-actions"><a>View</a></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="queue-section-hd">▾ Upcoming Meetings <span class="queue-count">2</span></div>
+      <table class="q-table">
+        <thead><tr><th>Escalation</th><th>Forum</th><th>Date</th><th>Lead</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><div class="q-topic">Data Retention Policy – Cross-Org Alignment</div></td>
+            <td><span class="badge" style="background:#dce8ff;color:#1A3ECA;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:10px;">L1</span></td>
+            <td style="font-size:12px;white-space:nowrap;">Jun 26, 2:00 PM</td>
+            <td style="font-size:12px;">E. Cheikosman</td>
+            <td><span class="status-pill s-review">Confirmed</span></td>
+          </tr>
+          <tr>
+            <td><div class="q-topic">Enforcement Action Response: EMEA Jurisdiction</div></td>
+            <td><span class="badge" style="background:#dce8ff;color:#1A3ECA;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:10px;">L1</span></td>
+            <td style="font-size:12px;white-space:nowrap;">Jun 28, 10:00 AM</td>
+            <td style="font-size:12px;">E. Cheikosman</td>
+            <td><span class="status-pill s-monitor">Prep in progress</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- FEEDBACK VIEW -->
+  <div class="view hidden" id="view-feedback">
+    <div class="fb-header">
+      <div class="fb-title">Feedback &amp; Bug Reports</div>
+      <div class="fb-desc">All submissions triaged, prioritized, and resolved independently — 95–98% of requests shipped within days.</div>
+    </div>
+    <div class="fb-body">
+      <div class="fb-type-row">
+        <div class="fb-type active" id="fb-feature">✦ Feature Request</div>
+        <div class="fb-type" id="fb-bug">⚠ Bug Report</div>
+      </div>
+      <div class="fb-form">
+        <div class="field">
+          <label class="field-label">Page / Section</label>
+          <select class="field-select"><option>Home</option><option>Submit Escalation</option><option>Escalation Guide</option><option>Review Queue</option><option>Archive</option><option>Dashboard</option><option>Other</option></select>
+        </div>
+        <div class="field">
+          <label class="field-label">Title</label>
+          <input class="field-input" type="text" placeholder="Brief description of the request or issue" />
+        </div>
+        <div class="field">
+          <label class="field-label">Details</label>
+          <textarea class="field-textarea" placeholder="Describe the feature you'd like, or what happened and what you expected instead..."></textarea>
+          <div class="char-count">0 / 300 characters</div>
+        </div>
+      </div>
+      <div class="fb-footer">
+        <button class="btn-submit">Submit Feedback</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- AI ASSISTANT FAB -->
+<div class="ai-fab" id="ai-fab" onclick="toggleAI()">✦</div>
+
+<!-- AI ASSISTANT POPUP -->
+<div class="ai-popup" id="ai-popup">
+  <div class="ai-popup-header">
+    <div>
+      <div class="ai-popup-title">IRC AI Assistant</div>
+      <div class="ai-popup-sub">Search 90+ archived decisions</div>
+    </div>
+    <span class="ai-popup-close" onclick="toggleAI()">✕</span>
+  </div>
+  <div class="ai-suggestions">
+    <div class="ai-suggestion" onclick="askAI(this.textContent)">What's the difference between L1 and L2 routing?</div>
+    <div class="ai-suggestion" onclick="askAI(this.textContent)">How do I know if my issue needs an escalation?</div>
+    <div class="ai-suggestion" onclick="askAI(this.textContent)">What happens after I submit a topic?</div>
+  </div>
+  <div class="ai-chat-area" id="ai-chat-area">
+    <div class="ai-chat-msg bot">I can help you navigate the escalation process, find past decisions, or explain routing criteria. What would you like to know?</div>
+  </div>
+  <div class="ai-input-row">
+    <input class="ai-input-field" id="ai-input-field" placeholder="Ask about escalations..." />
+    <button class="ai-send-btn" onclick="sendAI()">→</button>
+  </div>
+</div>
+
+<!-- Disclaimer -->
+<div style="position:fixed;bottom:0;left:0;right:0;padding:5px 14px;background:rgba(248,249,251,0.96);border-top:1px solid #e8eaed;font-size:10px;color:#8a8d91;z-index:500;text-align:center;letter-spacing:.01em;">
+  Illustrative mockup — all names, data, and content are entirely fictional. No proprietary or confidential information is depicted.
+</div>
+
+<!-- Tour cursor -->
+<div id="tc"><div class="tcr"></div></div>
+
+<script>
+  // ── VIEW SWITCHING ──
+  const navItems = document.querySelectorAll('.nav-item[data-view]');
+  const views    = document.querySelectorAll('.view');
+
+  function switchView(target) {
+    if (!target || target === 'none') return;
+    navItems.forEach(n => n.classList.remove('active'));
+    const an = document.querySelector(`.nav-item[data-view="${target}"]`);
+    if (an) an.classList.add('active');
+    views.forEach(v => v.classList.add('hidden'));
+    const tv = document.getElementById('view-' + target);
+    if (tv) tv.classList.remove('hidden');
+  }
+
+  navItems.forEach(item => {
+    item.addEventListener('click', () => switchView(item.dataset.view));
+  });
+
+  // Feedback type toggle
+  document.getElementById('fb-feature').addEventListener('click', function() {
+    this.classList.add('active'); document.getElementById('fb-bug').classList.remove('active');
+  });
+  document.getElementById('fb-bug').addEventListener('click', function() {
+    this.classList.add('active'); document.getElementById('fb-feature').classList.remove('active');
+  });
+
+  // ── ANIMATED TOUR ──
+  const seq = ['submit','guide','review-queue','feedback','home'];
+  let idx = 0, alive = true, t;
+  const cur = document.getElementById('tc');
+
+  function tourStep() {
+    if (!alive) return;
+    const view = seq[idx % seq.length];
+    const el = document.querySelector(`.nav-item[data-view="${view}"]`);
+    if (!el) { idx++; t = setTimeout(tourStep, 2800); return; }
+    const r = el.getBoundingClientRect();
+    cur.style.left = (r.left + r.width * .62) + 'px';
+    cur.style.top  = (r.top + r.height / 2) + 'px';
+    cur.style.opacity = '1';
+    setTimeout(() => {
+      if (!alive) return;
+      cur.classList.add('ck');
+      setTimeout(() => {
+        if (!alive) return;
+        cur.classList.remove('ck');
+        switchView(view);
+        idx++;
+        t = setTimeout(tourStep, 2700);
+      }, 220);
+    }, 680);
+  }
+
+  const ts = setTimeout(tourStep, 2000);
+  function stopTour() { alive=false; clearTimeout(t); clearTimeout(ts); cur.style.opacity='0'; }
+  document.addEventListener('click', stopTour, {once:true});
+
+  // ── AI ASSISTANT ──
+  const aiResponses = {
+    'What\'s the difference between L1 and L2 routing?': 'L1 SteerCo handles cross-functional decisions requiring VP-level alignment — policy, legal, and product representation with binding outcomes. L2 Circle is for complex issues needing cross-team coordination below SteerCo, with a faster cadence and a clear escalation path to L1 if unresolved.',
+    'How do I know if my issue needs an escalation?': 'Escalate when a decision requires alignment across two or more teams, when there\'s a legal or policy dependency, when the risk level is High or Critical, or when the issue has been stuck at the team level for more than one sprint. If in doubt, submit — the review queue will route it appropriately.',
+    'What happens after I submit a topic?': 'After submission, the IRC team reviews your topic within 24 hours and assigns it to L1 or L2 based on scope and complexity. A shared GChat space is created automatically with all relevant stakeholders added. You\'ll receive a routing decision notification and can track status in My Submissions.'
+  };
+
+  function toggleAI() {
+    document.getElementById('ai-popup').classList.toggle('open');
+  }
+
+  function askAI(msg) {
+    const chat = document.getElementById('ai-chat-area');
+    const uMsg = document.createElement('div');
+    uMsg.className = 'ai-chat-msg user';
+    uMsg.textContent = msg;
+    chat.appendChild(uMsg);
+    setTimeout(() => {
+      const bMsg = document.createElement('div');
+      bMsg.className = 'ai-chat-msg bot';
+      bMsg.textContent = aiResponses[msg] || 'Based on 90+ archived IRC decisions, the most relevant precedent suggests escalating through L2 Circle first, then elevating to L1 SteerCo if cross-functional VP alignment is needed. You can search the full archive by topic, date, or risk area.';
+      chat.appendChild(bMsg);
+      chat.scrollTop = chat.scrollHeight;
+    }, 500);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  function sendAI() {
+    const inp = document.getElementById('ai-input-field');
+    const msg = inp.value.trim();
+    if (!msg) return;
+    askAI(msg);
+    inp.value = '';
+  }
+
+  document.getElementById('ai-input-field').addEventListener('keydown', e => {
+    if (e.key === 'Enter') sendAI();
+  });
+</script>
+</body>
+</html>
