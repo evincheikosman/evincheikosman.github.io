@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Q — AI Routine &amp; Playlist Builder — Evîn Cheikosman</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Evîn<span>.</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="index.html#projects">Projects</a></li>
+    <li><a href="mailto:sokiec@gmail.com">Contact</a></li>
+  </ul>
+</nav>
+
+<main>
+  <section class="project-hero">
+    <div class="container">
+      <a href="index.html" class="back-link">← All projects</a>
+      <span class="section-label">Project 07 — Personal</span>
+      <h1 class="section-title" style="margin-top: 0.5rem;">Q — AI Routine &amp; Playlist Builder</h1>
+      <p style="color: var(--muted); margin-top: 0.25rem; font-size: 0.85rem; font-style: italic;">Built solo, outside of work, with no engineering team or org behind it</p>
+      <p style="color: var(--muted); margin-top: 0.75rem; max-width: 620px; font-size: 1.05rem;">
+        An AI-powered routine and playlist builder for Lagree fitness instructors — I'm a certified instructor myself, and Q replaces the 30–45 minutes of manual class-sequencing and playlist-building I used to do before every session.
+      </p>
+      <div class="project-meta">
+        <div class="meta-item">
+          <span class="meta-label">Role</span>
+          <span class="meta-value">Solo — product, design &amp; full-stack build</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Stack</span>
+          <span class="meta-value">Next.js, TypeScript, Claude API, Supabase</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Status</span>
+          <span class="meta-value">Live in production, testing with real users</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Live</span>
+          <span class="meta-value"><a href="https://q-app-delta.vercel.app" target="_blank" style="color: inherit;">q-app-delta.vercel.app ↗</a></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <div class="project-body">
+
+        <h2><span class="icon">⚠</span> The Problem</h2>
+        <p>
+          Before every Lagree class I teach, I was doing the same manual work: sequencing 30–45 minutes of exercises by hand — spring loads, platform facing, timing, cues — and separately building a playlist that actually matched the energy arc I wanted the class to have. It happens before you even walk in the door, every single time, and none of it requires a human once the pattern is clear. I wanted to see if I could build the tool myself, entirely outside of work, with no engineering background beyond what I'd taught myself at Meta.
+        </p>
+
+        <h2><span class="icon">⚙</span> What I Built</h2>
+        <p>
+          A full-stack Next.js app I designed, built, and shipped alone — from the AI generation logic through to a real-time multi-user backend. Unlike the internal tools I built at Meta, there was no existing user base, no stakeholders, and no engineering team to lean on — every architectural decision was mine to make and live with.
+        </p>
+        <ul>
+          <li>AI routine builder — instructor describes focus areas, energy arc, class level, and vibe; Claude generates a complete routine with ordered exercises, spring loads, timing, and instructor cues, tuned to a defined difficulty contract per energy arc</li>
+          <li>AI playlist curation — maps a requested artist anchor to a BPM-matched, DJ-style playlist via the Spotify API, tuned to avoid over-indexing on a single artist</li>
+          <li>Teach Mode — a glanceable, auto-advancing single-screen view of the current move, spring load, and countdown for use mid-class</li>
+          <li>Your Cue — reflects patterns in an instructor's own teaching data (top artists, recurring emphasis, energy arcs) back to them once there's enough history to say something real</li>
+          <li>Real per-user personalization — every device gets its own private profile, teaching schedule, and library; nothing is hardcoded to me</li>
+          <li>Real-time multi-user layer — anonymous accounts, invite-code friend connections, and live 1:1 messaging with routine/playlist sharing, backed by Postgres Row Level Security</li>
+          <li>Progressive Web App — installable on iOS/Android home screens, full offline-capable single-device core</li>
+        </ul>
+
+        <h2><span class="icon">◎</span> Technical Integrations</h2>
+        <ul>
+          <li>Anthropic Claude API — structured prompt engineering for routine generation and playlist curation, including a difficulty-contract system that ties an instructor's chosen energy arc to concrete move selection and progression rules</li>
+          <li>Spotify Web API + NextAuth.js — OAuth with automatic token refresh, playlist creation, track search and BPM/audio-feature filtering</li>
+          <li>Supabase (Postgres + Row Level Security + Realtime) — anonymous authentication, a friend-connection graph, and live-delivered direct messages, scoped narrowly so the rest of the app stays fully functional with zero backend configured</li>
+          <li>Claude Code — used throughout for implementation, debugging, and iterating on both the product and the underlying AI prompt design</li>
+        </ul>
+
+        <h2><span class="icon">↑</span> Where it stands</h2>
+        <div class="impact-grid">
+          <div class="impact-item">
+            <span class="impact-number">Solo</span>
+            <span class="impact-label">Every layer — product, design, AI prompt engineering, backend — built by one person</span>
+          </div>
+          <div class="impact-item">
+            <span class="impact-number">Live</span>
+            <span class="impact-label">Deployed to production on Vercel, installable as a PWA</span>
+          </div>
+          <div class="impact-item">
+            <span class="impact-number">Real users</span>
+            <span class="impact-label">In active testing with fellow instructors, each with their own private, personalized account</span>
+          </div>
+          <div class="impact-item">
+            <span class="impact-number">Zero → Full-stack</span>
+            <span class="impact-label">From no engineering background to shipping a production AI product with a real-time backend, unaided</span>
+          </div>
+        </div>
+
+        <h2><span class="icon">✦</span> What I Learned</h2>
+        <p>
+          Building Q was a different kind of test than the tools I built at Meta. There, I had a captive, motivated user base and a clear org problem to solve. Here, I had to make every product call myself — including the ones with no obvious right answer, like how to design a friend-connection model that's simple enough for a fitness instructor to use in ten seconds but secure enough to trust with real people's data.
+        </p>
+        <p>
+          The most instructive part was debugging the multi-user layer once real people started using it. Two friends couldn't connect to each other on the first try — the fix required understanding exactly how Postgres Row Level Security evaluates a query before the row it's protecting has been created, and designing a narrowly-scoped bypass instead of loosening security broadly. That's the kind of judgment call that only shows up once real users hit the system in ways you didn't script for.
+        </p>
+
+        <div class="divider"></div>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+          <a href="https://q-app-delta.vercel.app" target="_blank" class="btn btn-primary">View Live App →</a>
+          <a href="https://github.com/evincheikosman/q-app" target="_blank" class="btn btn-secondary">View Code</a>
+          <a href="index.html#projects" class="btn btn-secondary">All Projects</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; width: 100%;">
+    <span class="footer-name">Evîn Cheikosman</span>
+    <div class="footer-links">
+      <a href="about.html">About</a>
+      <a href="index.html#projects">Projects</a>
+      <a href="https://linkedin.com/in/evin-cheikosman" target="_blank">LinkedIn</a>
+      <a href="mailto:sokiec@gmail.com">Email</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
