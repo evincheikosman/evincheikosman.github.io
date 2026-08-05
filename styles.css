@@ -1,27 +1,27 @@
 /* =============================================
    EVÎN CHEIKOSMAN — PORTFOLIO STYLES
-   Warm off-white · near-black · forest green accent
+   Bright white · near-black · royal blue accent
    ============================================= */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
 
 :root {
   /* Core palette */
-  --t1: #F8F7F5;   /* warm off-white — background              */
+  --t1: #FFFFFF;   /* bright white — background                */
   --t2: #FFFFFF;   /* pure white — cards, surfaces             */
-  --t3: #6B6B65;   /* warm mid-gray — secondary text           */
-  --t4: #111111;   /* near-black — primary text                */
+  --t3: #5C6270;   /* cool mid-gray — secondary text           */
+  --t4: #0D0F14;   /* near-black — primary text                */
   --t5: #2B50C8;   /* royal blue — the single accent           */
 
   /* Semantic aliases */
   --bg:        var(--t1);
   --bg-card:   var(--t2);
-  --bg-alt:    #F3F2F0;
+  --bg-alt:    #F4F6FB;
   --muted:     var(--t3);
   --text:      var(--t4);
   --accent:    var(--t5);
-  --border:    rgba(17, 17, 17, 0.1);
-  --border-lt: rgba(17, 17, 17, 0.06);
+  --border:    rgba(13, 15, 20, 0.1);
+  --border-lt: rgba(13, 15, 20, 0.08);
   --radius:    12px;
   --radius-sm: 8px;
 
@@ -64,7 +64,7 @@ nav {
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 100;
-  background: rgba(248, 247, 245, 0.94);
+  background: rgba(255, 255, 255, 0.82);
   backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border-lt);
   padding: 0 2rem;
@@ -172,6 +172,14 @@ section { padding: 5rem 0; }
 }
 
 .hero h1 .highlight { color: var(--t5); }
+
+.name-pron {
+  font-size: 0.92rem;
+  color: var(--t3);
+  letter-spacing: 0.01em;
+  margin: -0.7rem 0 1.15rem;
+}
+.name-pron em { color: var(--t4); font-style: normal; font-weight: 600; }
 
 .hero-stat {
   font-size: 1.18rem;
@@ -312,7 +320,7 @@ section { padding: 5rem 0; }
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 1px 3px rgba(13, 15, 20, 0.05), 0 10px 28px rgba(20, 30, 70, 0.06);
 }
 
 /* Green shimmer line on hover */
@@ -856,12 +864,66 @@ footer {
 .hero-content > *:nth-child(5) { animation-delay: 0.44s; }
 .hero-content > *:nth-child(6) { animation-delay: 0.5s; }
 
+/* ── DARK SECTION (high-contrast band for punch) ── */
+.section-dark {
+  background: #0B0D12;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.section-dark .section-label { color: #8AA0FF; opacity: 1; }
+.section-dark .section-title { color: #FFFFFF; }
+.section-dark p { color: rgba(255, 255, 255, 0.72); }
+.section-dark a:not(.btn) { color: #8AA0FF; }
+.section-dark .stat-underline { text-decoration-color: rgba(138, 160, 255, 0.6); }
+.section-dark .btn-secondary {
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.28);
+  background: transparent;
+}
+.section-dark .btn-secondary:hover {
+  border-color: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.06);
+}
+.testimonials.section-dark {
+  background: #0B0D12;
+}
+.section-dark .testimonials-hint { color: rgba(255, 255, 255, 0.55); }
+.section-dark .testimonial-card {
+  background: #14171F;
+  border-color: rgba(255, 255, 255, 0.08);
+  border-top-color: rgba(138, 160, 255, 0.35);
+}
+.section-dark .quote,
+.section-dark .quote strong { color: #FFFFFF; }
+.section-dark .quote-author { color: rgba(255, 255, 255, 0.6); }
+
+/* ── HERO PHOTO ── */
+.hero-grid {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+}
+.hero-grid .hero-content { max-width: none; flex: 1 1 auto; }
+.hero-photo { flex: 0 0 auto; width: 290px; }
+.hero-photo img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 20px;
+  border: 1px solid var(--border-lt);
+  box-shadow: 0 16px 44px rgba(20, 30, 70, 0.16);
+  display: block;
+}
+
 /* ── RESPONSIVE ── */
 @media (max-width: 768px) {
+  .hero-grid { flex-direction: column-reverse; align-items: flex-start; gap: 2rem; }
+  .hero-photo { width: 160px; }
   .hero-stats { gap: 1.75rem; }
   .about-grid { grid-template-columns: 1fr; }
   .about-sidebar { position: static; }
   .nav-links { display: none; }
   .projects-grid { grid-template-columns: 1fr; }
   .hero h1 { font-size: 2.4rem; }
+  .testimonial-card { min-width: 300px; max-width: 300px; }
 }
